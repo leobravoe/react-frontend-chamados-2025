@@ -1,5 +1,6 @@
 import Contador from "./Contador"
 import Feed from "./Feed"
+import NovoPost from "./NovoPost"
 import Perfil from "./Perfil"
 import Saudacao from "./Saudacao"
 
@@ -12,6 +13,7 @@ const App = () => {
       <Saudacao nome="Ester" />
       <Contador />
       <Feed />
+      <NovoPost />
     </>
   )
 }
