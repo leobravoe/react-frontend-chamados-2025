@@ -21,6 +21,7 @@ const NovoPost = () => {
             <textarea value={texto} onChange={e => setTexto(e.target.value)} />
             <div>
                 <button type="submit">Publicar</button>
+                {/* Passando responsabilidade de alteração de estado de Pai para Filho */}
                 <Like curtidas={curtidas} onCurtir={curtir} />
             </div>
         </form>
