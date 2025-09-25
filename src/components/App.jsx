@@ -1,5 +1,6 @@
 import Contador from "./Contador"
 import Feed from "./Feed"
+import FeedFiltravel from "./FeedFiltravel"
 import NovoPost from "./NovoPost"
 import Perfil from "./Perfil"
 import Saudacao from "./Saudacao"
@@ -8,12 +9,12 @@ import Saudacao from "./Saudacao"
 const App = () => {
   return (
     <>
-      <p>Olá, React!</p>
       <Perfil />
       <Saudacao nome="Ester" />
       <Contador />
       <Feed />
       <NovoPost />
+      <FeedFiltravel />
     </>
   )
 }
