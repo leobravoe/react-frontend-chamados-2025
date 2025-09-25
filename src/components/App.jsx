@@ -1,3 +1,4 @@
+import BootstrapTest from "./BootstrapTest"
 import Contador from "./Contador"
 import Feed from "./Feed"
 import FeedFiltravel from "./FeedFiltravel"
@@ -15,6 +16,7 @@ const App = () => {
       <Feed />
       <NovoPost />
       <FeedFiltravel />
+      <BootstrapTest />
     </>
   )
 }
