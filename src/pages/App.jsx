@@ -1,10 +1,10 @@
-import BootstrapTest from "./BootstrapTest"
-import Contador from "./Contador"
-import Feed from "./Feed"
-import FeedFiltravel from "./FeedFiltravel"
-import NovoPost from "./NovoPost"
-import Perfil from "./Perfil"
-import Saudacao from "./Saudacao"
+import BootstrapTest from "../components/BootstrapTest"
+import Contador from "../components/Contador"
+import Feed from "../components/Feed"
+import FeedFiltravel from "../components/FeedFiltravel"
+import NovoPost from "../components/NovoPost"
+import Perfil from "../components/Perfil"
+import Saudacao from "../components/Saudacao"
 
 // src/App.jsx
 const App = () => {
