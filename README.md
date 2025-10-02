@@ -17,3 +17,22 @@
     ```bash
     npm run dev
     ```
+
+
+# Caso tenha o projeto clonado
+
+
+1. Reset no repositório:
+    ```bash
+    gir reset --hard
+    ```
+
+2. Limpe o repositório:
+    ```bash
+    git clean -fd
+    ```
+
+3. Baixe as alterações:
+    ```bash
+    git pull
+    ```
