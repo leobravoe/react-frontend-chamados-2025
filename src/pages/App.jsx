@@ -1,8 +1,12 @@
+import ChamadosList from "../components/ChamadosList"
+
 // src/App.jsx
 const App = () => {
   return (
     <>
-      <h1>App</h1>
+      <h1>
+        <ChamadosList />
+      </h1>
     </>
   )
 }
