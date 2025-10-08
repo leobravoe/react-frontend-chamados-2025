@@ -5,11 +5,11 @@ import Sobre from './pages/Sobre.jsx'
 import Contato from './pages/Contato.jsx';
 
 const router = createBrowserRouter([
-  { path: "/", element: <App /> },
-  { path: "/sobre", element: <Sobre /> },
-  { path: "/contato", element: <Contato /> },
+    { path: "/", element: <App /> },
+    { path: "/sobre", element: <Sobre /> },
+    { path: "/contato", element: <Contato /> },
 ]);
 
 createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router} />
+    <RouterProvider router={router} />
 )

@@ -3,13 +3,11 @@ import Navbar from "../components/Navbar"
 
 // src/App.jsx
 const App = () => {
-  return (
-    <>
-      <h1>
-        <Navbar />
-        <ChamadosList />
-      </h1>
-    </>
-  )
+    return (
+        <>
+            <Navbar />
+            <ChamadosList />
+        </>
+    )
 }
 export default App
