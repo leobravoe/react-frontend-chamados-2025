@@ -5,8 +5,8 @@ import Navbar from "../components/Navbar"
 const App = () => {
     return (
         <div>
-            <h1>App</h1>
             <Navbar />
+            <h1>App</h1>
             <ChamadosList />
         </div>
     )
