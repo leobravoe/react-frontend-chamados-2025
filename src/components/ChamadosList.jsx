@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Chamado from './Chamado';
 
 const ChamadosList = () => {
     // 1. Estados para guardar os dados, o status de carregamento e possíveis erros
@@ -35,13 +36,7 @@ const ChamadosList = () => {
     return (
         <div>
             {
-                chamados.map(chamado =>
-                    <p>
-                        {chamado.usuarios_id} -
-                        {chamado.texto} -
-                        {chamado.estado}
-                    </p>
-                )
+                chamados.map(chamado => <Chamado chamado={chamado} /> )
             }
         </div>
     )

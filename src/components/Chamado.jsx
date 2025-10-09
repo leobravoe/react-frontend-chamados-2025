@@ -1,8 +1,13 @@
 import React from 'react'
 
-const Chamado = () => {
+const Chamado = ({ chamado }) => {
     return (
-        <div>Chamado</div>
+        <div>
+            {chamado.Usuarios_id} -
+            {chamado.texto} -
+            {chamado.estado} -
+            {chamado.urlImagem}
+        </div>
     )
 }
 

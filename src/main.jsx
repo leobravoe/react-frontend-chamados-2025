@@ -4,6 +4,9 @@ import App from './pages/App.jsx'
 import Sobre from './pages/Sobre.jsx'
 import Contato from './pages/Contato.jsx';
 
+import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap/dist/js/bootstrap.min.js"
+
 const router = createBrowserRouter([
     { path: "/", element: <App /> },
     { path: "/sobre", element: <Sobre /> },
