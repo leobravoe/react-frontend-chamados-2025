@@ -36,7 +36,7 @@ const ChamadosList = () => {
     return (
         <div>
             {
-                chamados.map(chamado => <Chamado chamado={chamado} /> )
+                chamados.map(chamado => <Chamado key={chamado.id} chamado={chamado} /> )
             }
         </div>
     )
