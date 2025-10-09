@@ -8,7 +8,9 @@ const Chamado = ({ chamado }) => {
                     Chamado <strong>#{chamado.id}</strong> Usuário <strong>#{chamado.Usuarios_id}</strong>
                 </div>
                 <div class="card-body">
-                    <img width={40} src={chamado.urlImagem} />
+                    <img width={40} src={chamado.urlImagem} onError={
+                        (e) => e.currentTarget.src = "/img/imagemErro404.png"
+                    } />
                     <span>{chamado.texto}</span>
                 </div>
                 <div class="card-footer text-body-secondary">
