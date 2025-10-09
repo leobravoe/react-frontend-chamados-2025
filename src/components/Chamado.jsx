@@ -3,21 +3,19 @@ import React from 'react'
 const Chamado = ({ chamado }) => {
     return (
         <div>
-            {chamado.Usuarios_id} -
-            {chamado.texto} -
-            {chamado.estado} -
-            {chamado.urlImagem}
-            <div class="card text-center">
+            <div class="card m-2">
                 <div class="card-header">
-                    Featured
+                    Chamado <strong>#{chamado.id}</strong> Usuário <strong>#{chamado.Usuarios_id}</strong>
                 </div>
                 <div class="card-body">
-                    <h5 class="card-title">Special title treatment</h5>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a href="#" class="btn btn-primary">Go somewhere</a>
+                    <img width={40} src={chamado.urlImagem} />
+                    <span>{chamado.texto}</span>
                 </div>
                 <div class="card-footer text-body-secondary">
-                    2 days ago
+                    {chamado.estado == "a" && <button className="btn btn-success">Ativo</button>}
+                    {chamado.estado == "f" && <button className="btn btn-secondary">Inativo</button>}
+                    <button className="btn btn-info mx-2">Editar</button>
+                    <button className="btn btn-danger">Remover</button>
                 </div>
             </div>
         </div>
