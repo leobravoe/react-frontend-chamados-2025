@@ -14,8 +14,8 @@ const Chamado = ({ chamado }) => {
                     <span>{chamado.texto}</span>
                 </div>
                 <div className="card-footer text-body-secondary">
-                    {chamado.estado == "a" && <button className="btn btn-success">Ativo</button>}
-                    {chamado.estado == "f" && <button className="btn btn-secondary">Inativo</button>}
+                    {chamado.estado === "a" && <button className="btn btn-success">Ativo</button>}
+                    {chamado.estado === "f" && <button className="btn btn-secondary">Inativo</button>}
                     <button className="btn btn-info mx-2 text-white">Editar</button>
                     <button className="btn btn-danger">Remover</button>
                 </div>

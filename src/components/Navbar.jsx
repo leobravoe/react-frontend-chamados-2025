@@ -4,8 +4,7 @@ export default function Navbar() {
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
-                <Link className="navbar-brand" to="/">Exemplo React</Link>
-
+                <Link className="navbar-brand" to="/">Exemplo React</Link>                
                 <button
                     className="navbar-toggler"
                     type="button"
@@ -17,26 +16,15 @@ export default function Navbar() {
                 >
                     <span className="navbar-toggler-icon"></span>
                 </button>
-
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <NavLink
-                                to="/sobre"
-                                className={({ isActive }) =>
-                                    isActive ? "nav-link active" : "nav-link"
-                                }
-                            >
+                            <NavLink to="/sobre" className="nav-link">
                                 Sobre
                             </NavLink>
                         </li>
                         <li className="nav-item">
-                            <NavLink
-                                to="/contato"
-                                className={({ isActive }) =>
-                                    isActive ? "nav-link active" : "nav-link"
-                                }
-                            >
+                            <NavLink to="/contato" className="nav-link">
                                 Contato
                             </NavLink>
                         </li>
