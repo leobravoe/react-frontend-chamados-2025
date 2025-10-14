@@ -6,9 +6,9 @@ const Chamado = ({ chamado }) => {
                     Chamado <strong>#{chamado.id}</strong> Usuário <strong>#{chamado.Usuarios_id}</strong>
                 </div>
                 <div className="card-body">
-                    <img className="me-2" width={40} src={chamado.urlImagem} onError={
+                    {chamado.urlImagem && <img className="me-2" width={40} src={chamado.urlImagem} onError={
                         (e) => e.currentTarget.src = "/img/imagemErro404.png"
-                    } />
+                    } />}
                     <span>{chamado.texto}</span>
                 </div>
                 <div className="card-footer text-body-secondary">

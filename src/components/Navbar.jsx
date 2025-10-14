@@ -4,7 +4,7 @@ export default function Navbar() {
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
-                <Link className="navbar-brand" to="/">Exemplo React</Link>                
+                <Link className="navbar-brand" to="/">Atende Aí</Link>                
                 <button
                     className="navbar-toggler"
                     type="button"
