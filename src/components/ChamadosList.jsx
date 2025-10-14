@@ -41,5 +41,4 @@ const ChamadosList = () => {
         </div>
     )
 }
-
 export default ChamadosList

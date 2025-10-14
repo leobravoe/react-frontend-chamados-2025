@@ -1,5 +1,3 @@
-import React from 'react'
-
 const Chamado = ({ chamado }) => {
     return (
         <div>
@@ -23,5 +21,4 @@ const Chamado = ({ chamado }) => {
         </div>
     )
 }
-
 export default Chamado
