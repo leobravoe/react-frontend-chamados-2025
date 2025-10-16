@@ -7,12 +7,13 @@ const ChamadosList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+    // Chamado depois do primeiro RENDER
     useEffect(() => {
         // Define função assíncrona para realizar a busca
         const fetchChamados = async () => {
             try {
                 // A URL completa da nossa API
-                const response = await fetch('http://localhost:3000/api/chamados');
+                const response = await fetch('http://localhost:3000/api/chamados'); // ERRO
                 if (!response.ok) {
                     throw new Error(`Erro HTTP: ${response.status}`);
                 }
