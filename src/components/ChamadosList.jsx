@@ -9,11 +9,14 @@ const ChamadosList = () => {
 
     // Chamado depois do primeiro RENDER
     useEffect(() => {
+        const abortController = new AbortController();
         // Define função assíncrona para realizar a busca
         const fetchChamados = async () => {
             try {
                 // A URL completa da nossa API
-                const response = await fetch('http://localhost:3000/api/chamados'); // ERRO
+                const response = await fetch('http://localhost:3000/api/chamados', 
+                    { signal: abortController.signal }
+                ); // ERRO
                 if (!response.ok) {
                     throw new Error(`Erro HTTP: ${response.status}`);
                 }
@@ -23,6 +26,9 @@ const ChamadosList = () => {
                 setError(err.message); // Guarda a mensagem de erro no estado
             } finally {
                 setLoading(false); // Finaliza o carregamento, com sucesso ou erro
+            }
+            return () => {
+                abortController.abort();
             }
         };
         fetchChamados(); // Executa a função
