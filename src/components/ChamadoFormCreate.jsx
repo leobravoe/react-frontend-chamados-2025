@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom';
+
 
 const ChamadoFormCreate = () => {
     const [Usuarios_id, setUsuariosId] = useState("1");
@@ -6,9 +8,26 @@ const ChamadoFormCreate = () => {
     const [estado, setEstado] = useState("a");
     const [url_imagem, setUrlImagem] = useState("");
 
-    const handleSubmit = (e) => {
+    const navigate = useNavigate();
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Função chamada");
+        const sendData = JSON.stringify(
+            {
+                Usuarios_id,
+                texto,
+                estado,
+                url_imagem
+            }
+        );
+        await fetch("http://localhost:3000/api/chamados", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: sendData
+        });
+        navigate("/chamados");
     }
 
     return (
