@@ -3,9 +3,11 @@ import { useState, useEffect } from 'react';
 import Chamado from './Chamado';
 // ChamadosList com cache no localStorage
 const ChamadosList = () => {
+    // Pega o cache do LocalStorage
+    const chamadosCache = JSON.parse(localStorage.getItem('chamadosCache'));
     // 1. Estados para guardar os dados, o status de carregamento e possíveis erros
-    const [chamados, setChamados] = useState(JSON.parse(localStorage.getItem('chamadosCache')) ?? []);
-    const [loading, setLoading] = useState(JSON.parse(localStorage.getItem('chamadosCache')) ? false : true);
+    const [chamados, setChamados] = useState(chamadosCache ?? []);
+    const [loading, setLoading] = useState(chamadosCache ? false : true);
     const [error, setError] = useState(null);
     // 2. O useEffect para buscar os dados
     useEffect(() => {
@@ -33,7 +35,7 @@ const ChamadosList = () => {
             }
         };
         // Caso não haja cache armazenado
-        if (!JSON.parse(localStorage.getItem('chamadosCache')))
+        if (!chamadosCache)
             fetchChamados(); // Executa a função a primeira vez
         // A cada 5 segundos fetchChamados() será chamada
         const interval5secs = setInterval(() => {
