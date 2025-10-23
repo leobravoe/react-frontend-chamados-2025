@@ -54,7 +54,7 @@ const ChamadosList = () => {
     return (
         <div>
             {error && <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="toast text-bg-danger bg-opacity-50 show" role="alert" aria-live="assertive" aria-atomic="true">
                     <div class="toast-header">
                         <strong class="me-auto">Erro</strong>
                         <button
