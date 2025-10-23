@@ -20,14 +20,21 @@ const ChamadoFormCreate = () => {
                 url_imagem
             }
         );
-        await fetch("http://localhost:3000/api/chamados", {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: sendData
-        });
-        navigate("/chamados");
+        try {
+            const response = await fetch("http://localhost:3000/api/chamados", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: sendData
+            });
+            if(!response.ok){
+                throw new Error(response.status);
+            }
+            navigate("/chamados");
+        } catch (error) {
+            console.error(error);
+        }
     }
 
     return (
