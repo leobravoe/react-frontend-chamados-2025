@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import Chamado from './Chamado';
 // ChamadosList com cache no localStorage
 const ChamadosList = () => {
-    // Pega o cache do LocalStorage
+    // Pega o cache do LocalStorage, caso não encontre recebe null
     const chamadosCache = JSON.parse(localStorage.getItem('chamadosCache'));
     // 1. Estados para guardar os dados, o status de carregamento e possíveis erros
     const [chamados, setChamados] = useState(chamadosCache ?? []);
