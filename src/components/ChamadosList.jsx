@@ -34,9 +34,7 @@ const ChamadosList = () => {
                 setLoading(false); // Finaliza o carregamento, com sucesso, erro ou cancelamento
             }
         };
-        // Caso não haja cache armazenado
-        if (!chamadosCache)
-            fetchChamados(); // Executa a função a primeira vez
+        fetchChamados(); // Executa a função a primeira vez
         // A cada 5 segundos fetchChamados() será chamada
         const interval5secs = setInterval(() => {
             fetchChamados(); // Executa a função de tempos em tempos

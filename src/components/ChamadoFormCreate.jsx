@@ -36,7 +36,7 @@ const ChamadoFormCreate = () => {
                 <label className='form-label' htmlFor="id-input-Usuarios_id">Usuarios_id</label>
                 <input
                     className='form-control'
-                    type="text"
+                    type="number"
                     id="id-input-Usuarios_id"
                     value={Usuarios_id}
                     onChange={(e) => setUsuariosId(e.target.value)}
@@ -54,19 +54,19 @@ const ChamadoFormCreate = () => {
             </div>
             <div className='my-2'>
                 <label className='form-label' htmlFor="id-input-estado">estado</label>
-                <input
-                    className='form-control'
-                    type="text"
-                    id="id-input-estado"
-                    value={estado}
+                <select
+                    className='form-select'
                     onChange={(e) => setEstado(e.target.value)}
-                />
+                >
+                    <option value="a">Ativo</option>
+                    <option value="f">Fechado</option>
+                </select>
             </div>
             <div className='my-2'>
                 <label className='form-label' htmlFor="id-input-url_imagem">url_imagem</label>
                 <input
                     className='form-control'
-                    type="text"
+                    type="file"
                     id="id-input-url_imagem"
                     value={url_imagem}
                     onChange={(e) => setUrlImagem(e.target.value)}
