@@ -11,8 +11,8 @@ const ChamadoFormCreate = () => {
     const [texto, setTexto] = useState("");
     // Estado para armazenar o estado do chamado ('a' para Ativo, 'f' para Fechado).
     const [estado, setEstado] = useState("a");
-    // Estado para armazenar a URL ou caminho da imagem.
-    const [url_imagem, setUrlImagem] = useState("");
+    // Estado para armazenar o arquivo de imagem selecionado (File) para envio via multipart/form-data.
+    const [imagem, setImagem] = useState(null);
     // Estado para armazenar qualquer erro que ocorra durante a submissão.
     const [error, setError] = useState(null);
     // Hook para navegação programática (redirecionamento) após a submissão.
@@ -25,27 +25,21 @@ const ChamadoFormCreate = () => {
         // Previne o comportamento padrão de recarregar a página.
         e.preventDefault();
         
-        // Constrói o objeto de dados a ser enviado para a API e o serializa para JSON.
-        const sendData = JSON.stringify(
-            {
-                Usuarios_id, // Atributo: valor do estado "Usuarios_id"
-                texto,       // Atributo: valor do estado "texto"
-                estado,      // Atributo: valor do estado "estado"
-                url_imagem   // Atributo: valor do estado "url_imagem"
-            }
-        );
+        // Constrói o corpo multipart/form-data para enviar campos + arquivo (imagem).
+        const fd = new FormData();
+        fd.append('Usuarios_id', Usuarios_id); // Atributo: valor do estado "Usuarios_id"
+        fd.append('texto', texto);             // Atributo: valor do estado "texto"
+        fd.append('estado', estado);           // Atributo: valor do estado "estado"
+        if (imagem) {
+            fd.append('imagem', imagem);       // Atributo de arquivo: campo "imagem" esperado pelo backend
+        }
         
         // Inicia o bloco try-catch para lidar com a chamada da API e possíveis erros.
         try {
-            // Faz a requisição POST para a API.
+            // Faz a requisição POST para a API usando multipart/form-data (não defina Content-Type manualmente).
             const response = await fetch("http://localhost:3000/api/chamados", {
                 method: 'POST',
-                headers: {
-                    // Define o tipo de conteúdo como JSON.
-                    'Content-Type': 'application/json',
-                },
-                // Corpo da requisição com os dados do chamado.
-                body: sendData
+                body: fd
             });
             
             // Verifica se a resposta da requisição não foi bem-sucedida (status 4xx ou 5xx).
@@ -76,7 +70,8 @@ const ChamadoFormCreate = () => {
     
     return (
         // Formulário HTML, com a função handleSubmit ligada ao evento de submissão.
-        <form onSubmit={handleSubmit} className='m-2'>
+        // Usa "multipart/form-data" para permitir envio de arquivo.
+        <form onSubmit={handleSubmit} className='m-2' encType="multipart/form-data">
             {/* Renderização condicional do Toast de erro.
               Exibe um toast (usando classes de estilo Bootstrap) se houver um erro no estado.
             */}
@@ -138,17 +133,16 @@ const ChamadoFormCreate = () => {
                 </select>
             </div>
             
-            {/* Campo de input para a URL da Imagem (usando type="file" mas com a lógica de valor de string) */}
+            {/* Campo de input para selecionar a imagem (arquivo) */}
             <div className='my-2'>
-                <label className='form-label' htmlFor="id-input-url_imagem">url_imagem</label>
+                <label className='form-label' htmlFor="id-input-imagem">imagem</label>
                 <input
                     className='form-control'
-                    // O tipo "file" é geralmente usado para upload, mas aqui parece estar esperando uma URL (string) no estado.
-                    type="file" 
-                    id="id-input-url_imagem"
-                    value={url_imagem}
-                    // Atualiza o estado `url_imagem`.
-                    onChange={(e) => setUrlImagem(e.target.value)}
+                    type="file"
+                    id="id-input-imagem"
+                    accept="image/*"
+                    // Atualiza o estado `imagem` com o arquivo selecionado.
+                    onChange={(e) => setImagem(e.target.files?.[0] ?? null)}
                 />
             </div>
             
