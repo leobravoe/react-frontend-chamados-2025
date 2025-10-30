@@ -46,6 +46,11 @@ const ChamadosList = () => {
             clearInterval(interval5secs);
         };
     }, []); // O array de dependências vazio garante que o efeito rode apenas uma vez
+
+    const onEstadoChange = () => {
+        
+    }
+
     // 4. Renderização condicional do componente
     if (loading) {
         return <p>Carregando chamados...</p>;
