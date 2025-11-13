@@ -6,9 +6,11 @@ const Sobre = () => {
     return (
         <div>
             <Navbar />
-            <h1>Componente Página Sobre</h1>
-            <RelogioRuim />
-            <RelogioOk />
+            <h1 className="mx-2">Sobre.jsx</h1>
+            <div className="mx-2">
+                <RelogioRuim />
+                <RelogioOk />
+            </div>
         </div>
     )
 }

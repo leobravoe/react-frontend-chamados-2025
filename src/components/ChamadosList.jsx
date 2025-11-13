@@ -1,86 +1,141 @@
 // src/components/ChamadosList.jsx
+//
+// OBJETIVO
+// -----------------------------------------------------------------------------
+// Este componente busca periodicamente a lista de "chamados" no backend,
+// guarda um cache no localStorage, mostra erros em um toast simples e
+// renderiza cada item usando o componente <Chamado />.
+//
+// -----------------------------------------------------------------------------
+// - useState: cria estados reativos para dados (chamados), loading e erro.
+// - useEffect: executa efeitos colaterais (ex.: buscar dados ao montar).
+// - AbortController: permite cancelar uma requisição fetch se o componente
+//   for desmontado (evita "state update on unmounted component").
+// - useAuthFetch: helper baseado em fetch que já:
+//     * Anexa Authorization: Bearer <access_token> (se existir em sessionStorage);
+//     * Envia cookies (refresh HttpOnly);
+//     * Tenta renovar o access token automaticamente quando a API responder 401;
+//     * Refaz a requisição original uma única vez após o refresh.
+// - localStorage: salva um "cache" da última lista para renderizar rápido
+//   (mesmo antes de a nova busca terminar).
+
 import { useState, useEffect } from 'react';
 import Chamado from './Chamado';
-// ChamadosList com cache no localStorage
+import { useAuthFetch } from '../hooks/useAuthFetch';
+
 const ChamadosList = () => {
-    // Pega o cache do LocalStorage, caso não encontre recebe null
+    // Tenta ler um cache previamente salvo (ou null se não houver).
     const chamadosCache = JSON.parse(localStorage.getItem('chamadosCache'));
-    // 1. Estados para guardar os dados, o status de carregamento e possíveis erros
+
+    // Estados da tela:
+    // - chamados: a lista vinda da API (ou o cache inicial).
+    // - loading: exibe "Carregando..." enquanto a primeira busca acontece.
+    // - error: mensagem de erro para o toast (string ou null).
     const [chamados, setChamados] = useState(chamadosCache ?? []);
     const [loading, setLoading] = useState(chamadosCache ? false : true);
     const [error, setError] = useState(null);
-    // 2. O useEffect para buscar os dados
+
+    // Pega a função de busca autenticada (cuida de Bearer + refresh automático).
+    const authFetch = useAuthFetch();
+
     useEffect(() => {
-        // Cria um AbortController para gerenciar a requisição
+        // Controlador para permitir cancelar a(s) requisição(ões) se o componente desmontar.
         const abortController = new AbortController();
-        // Define função assíncrona para realizar a busca
+
+        // Função que efetivamente busca a lista na API.
         const fetchChamados = async () => {
             try {
-                // A URL completa da nossa API, agora com o sinal do controller
-                const response = await fetch('http://localhost:3000/api/chamados', {
-                    signal: abortController.signal
+                // Faz GET usando o helper; passamos o signal do AbortController.
+                const res = await authFetch('http://localhost:3000/api/chamados', {
+                    method: 'GET',
+                    signal: abortController.signal,
                 });
-                // Se houver erro na resposta
-                if (!response.ok) throw new Error(`Erro HTTP: ${response.status}`);
-                // Se não houver atualização nos dados
-                if (response.status == 304) return;
-                const data = await response.json(); // Converte para JSON
-                setChamados(data); // Guarda os dados no estado
-                setError(null);    // Limpa algum erro
-                localStorage.setItem('chamadosCache', JSON.stringify(data)); // Guarda no localStorage
+
+                // Se não for 2xx, geramos um erro para cair no catch.
+                if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+
+                // Se o servidor respondeu 304 (sem mudanças), não atualiza estado/localStorage.
+                if (res.status === 304) return;
+
+                // Lê o corpo como JSON e atualiza a lista e o cache.
+                const data = await res.json();
+                setChamados(data);
+                localStorage.setItem('chamadosCache', JSON.stringify(data));
             } catch (err) {
-                setError(err.message); // Seta o estado de erro
+                // Se o erro veio de um abort() (usuário saiu da tela, por ex.), apenas ignore.
+                if (err?.name === 'AbortError') return;
+
+                // Para qualquer outro erro, mostramos no toast.
+                setError(err.message);
             } finally {
-                setLoading(false); // Finaliza o carregamento, com sucesso, erro ou cancelamento
+                // Após a primeira tentativa (com sucesso ou erro), desliga o "Carregando...".
+                setLoading(false);
             }
         };
-        fetchChamados(); // Executa a função a primeira vez
-        // A cada 5 segundos fetchChamados() será chamada
-        const interval5secs = setInterval(() => {
-            fetchChamados(); // Executa a função de tempos em tempos
-        }, 5000);
-        // 3. A função de limpeza do useEffect.
-        //    Será chamada quando o componente for desmontado.
+
+        // 1ª carga imediatamente ao montar.
+        fetchChamados();
+
+        // Atualiza a lista a cada 5s. Útil para "quase tempo real".
+        const interval5secs = setInterval(fetchChamados, 5000);
+
+        // Limpeza do efeito:
+        // - Cancela qualquer requisição em andamento;
+        // - Para o intervalo de atualizações.
         return () => {
-            abortController.abort(); // Cancela a requisição fetch em andamento
+            abortController.abort();
             clearInterval(interval5secs);
         };
-    }, []); // O array de dependências vazio garante que o efeito rode apenas uma vez
+    }, []); // [] = executa o efeito apenas uma vez, ao montar o componente.
 
-    const onEstadoChange = () => {
-        
-    }
+    // Callback chamado pelo filho <Chamado /> quando um item foi atualizado no backend.
+    // Substitui o item correspondente na lista local (mantém os demais).
+    const onChamadoEstadoChange = (chamadoAlterado) => {
+        const newChamados = chamados.map((ch) =>
+            ch.id == chamadoAlterado.id ? chamadoAlterado : ch
+        );
+        setChamados(newChamados);
+    };
 
-    // 4. Renderização condicional do componente
+    // Enquanto estiver carregando a primeira busca, mostra um placeholder simples.
     if (loading) {
         return <p>Carregando chamados...</p>;
     }
-    // 5. Renderização do componente
+
+    // Renderização principal:
+    // - Se existir "error", renderiza um toast (usa classes de estilo do Bootstrap).
+    // - Mapeia a lista e renderiza um <Chamado /> por item.
     return (
         <div>
-            {error && <div class="toast-container position-fixed bottom-0 end-0 p-3">
-                <div class="toast text-bg-danger bg-opacity-50 show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="toast-header">
-                        <strong class="me-auto">Erro</strong>
+            {error && <div className="toast-container position-fixed bottom-0 end-0 p-3">
+                <div className="toast text-bg-danger bg-opacity-50 show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div className="toast-header">
+                        <strong className="me-auto">Erro</strong>
                         <button
                             type="button"
-                            class="btn-close"
+                            className="btn-close"
                             aria-label="Close"
                             onClick={() => setError(null)}
                         >
                         </button>
                     </div>
-                    <div class="toast-body">
+                    <div className="toast-body">
                         {error}
                     </div>
                 </div>
             </div>}
             <div>
                 {chamados.map((chamado) => (
-                    <Chamado key={chamado.id} chamado={chamado} />
+                    <Chamado
+                        key={chamado.id}
+                        chamado={chamado}
+                        setError={setError}
+                        onChamadoEstadoChange={onChamadoEstadoChange}
+                    />
                 ))}
             </div>
         </div>
     );
 };
+
 export default ChamadosList;

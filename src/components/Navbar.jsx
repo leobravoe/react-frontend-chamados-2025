@@ -1,4 +1,5 @@
 import { Link, NavLink } from "react-router-dom";
+import ThemeButton from "./ThemeButton";
 
 export default function Navbar() {
     return (
@@ -30,6 +31,7 @@ export default function Navbar() {
                         </li>
                     </ul>
                 </div>
+                <ThemeButton />
             </div>
         </nav>
     );
