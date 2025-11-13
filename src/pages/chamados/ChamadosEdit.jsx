@@ -8,7 +8,7 @@ const ChamadosEdit = () => {
 
     // Se não tiver usuário logado, redireciona declarativamente
     if (!user) {
-        return <Navigate to="/" replace />;
+        return <Navigate to="/usuarios/login" replace />;
     }
 
     return (
