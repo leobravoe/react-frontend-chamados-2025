@@ -1,15 +1,16 @@
 import Navbar from '../../components/Navbar'
 import ChamadoFormCreate from '../../components/ChamadoFormCreate'
 import { useCurrentUser } from "../../hooks/useCurrentUser";
-import { useNavigate } from "react-router-dom";
-import { Link } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom';
 
 const ChamadosCreate = () => {
     const currentUser = useCurrentUser();
-    const navigate = useNavigate();
     const user = currentUser();
 
-    if (!user) navigate("/");
+    // Se não tiver usuário logado, redireciona declarativamente
+    if (!user) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <div>

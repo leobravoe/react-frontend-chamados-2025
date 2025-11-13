@@ -2,8 +2,18 @@
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import UsuariosFormLogin from "../../components/UsuariosFormLogin";
+import { useCurrentUser } from "../../hooks/useCurrentUser";
+import { Navigate } from 'react-router-dom';
 
 const UsuariosLogin = () => {
+    const currentUser = useCurrentUser();
+    const user = currentUser();
+
+    // Se tiver usuário logado, redireciona declarativamente
+    if (user) {
+        return <Navigate to="/" replace />;
+    }
+
     return (
         <div>
             <Navbar />

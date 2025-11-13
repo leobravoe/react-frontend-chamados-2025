@@ -2,15 +2,16 @@ import React from 'react'
 import Navbar from '../../components/Navbar'
 import ChamadosList from '../../components/ChamadosList'
 import { useCurrentUser } from "../../hooks/useCurrentUser";
-import { Link } from 'react-router-dom'
-import { useNavigate } from "react-router-dom";
+import { Link, Navigate } from 'react-router-dom';
 
 const ChamadosIndex = () => {
     const currentUser = useCurrentUser();
-    const navigate = useNavigate();
     const user = currentUser();
 
-    if (!user) navigate("/");
+    // Se não tiver usuário logado, redireciona declarativamente
+    if (!user) {
+        return <Navigate to="/" replace />;
+    }
 
     return (
         <div>
@@ -20,7 +21,7 @@ const ChamadosIndex = () => {
             <Link to="/chamados/create" className='btn btn-primary'>Criar chamado</Link>
             <ChamadosList />
         </div>
-    )
+    );
 }
 
-export default ChamadosIndex
+export default ChamadosIndex;
