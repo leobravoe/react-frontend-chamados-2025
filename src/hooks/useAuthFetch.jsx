@@ -1,4 +1,4 @@
-// src/hooks/useAuthFetch.js
+// src/hooks/useAuthFetch.jsx
 
 // Este hook cria uma função "authFetch" que faz requisições HTTP com:
 // 1) Access Token no header Authorization (quando existir em sessionStorage);
@@ -45,7 +45,6 @@ const useAuthFetch = () => {
       // Opções base para o fetch (usadas tanto na 1ª quanto na 2ª tentativa)
       const baseOptions = {
         ...restOptions,
-        credentials: "include", // essencial para enviar cookies (refresh_token HttpOnly)
         signal,
       };
 
