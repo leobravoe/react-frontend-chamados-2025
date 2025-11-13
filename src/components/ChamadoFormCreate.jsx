@@ -111,32 +111,33 @@ const ChamadoFormCreate = () => {
 
             {/* Campo de texto principal do chamado */}
             <div className='my-2'>
-                <label className='form-label' htmlFor="id-input-texto">texto</label>
+                <label className='form-label' htmlFor="id-input-texto">Texto</label>
                 <input
                     className='form-control'
                     type="text"
                     id="id-input-texto"
                     value={texto}
                     onChange={(e) => setTexto(e.target.value)}
+                    placeholder='Digite o texto do chamado'
                 />
             </div>
 
             {/* Select simples para o estado inicial do chamado */}
             <div className='my-2'>
-                <label className='form-label' htmlFor="id-select-estado">estado</label>
+                <label className='form-label' htmlFor="id-select-estado">Estado</label>
                 <select
                     id='id-select-estado'
                     className='form-select'
                     onChange={(e) => setEstado(e.target.value)}
                 >
-                    <option value="a">Ativo</option>
+                    <option value="a">Aberto</option>
                     <option value="f">Fechado</option>
                 </select>
             </div>
 
             {/* Upload de arquivo (imagem). O arquivo real fica em e.target.files[0]. */}
             <div className='my-2'>
-                <label className='form-label' htmlFor="id-input-imagem">imagem</label>
+                <label className='form-label' htmlFor="id-input-imagem">Imagem</label>
                 <input
                     className='form-control'
                     type="file"

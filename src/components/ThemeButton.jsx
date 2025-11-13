@@ -9,7 +9,7 @@ const ThemeButton = () => {
     }, [darkMode]);
 
     return (
-        <div className="form-check form-switch">
+        <div className="form-check form-switch m-0">
             <input
                 className="form-check-input"
                 type="checkbox"

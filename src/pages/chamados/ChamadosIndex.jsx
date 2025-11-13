@@ -1,9 +1,17 @@
 import React from 'react'
 import Navbar from '../../components/Navbar'
 import ChamadosList from '../../components/ChamadosList'
+import { useCurrentUser } from "../../hooks/useCurrentUser";
 import { Link } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 const ChamadosIndex = () => {
+    const currentUser = useCurrentUser();
+    const navigate = useNavigate();
+    const user = currentUser();
+
+    if (!user) navigate("/");
+
     return (
         <div>
             <Navbar />

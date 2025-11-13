@@ -7,10 +7,10 @@ const App = () => {
         <div>
             <Navbar />
             <h1 className="mx-2">App.jsx</h1>
-            <Link to="/usuarios/login" className="btn btn-primary mx-2">Entrar com Usuários</Link>
-            <Link to="/usuarios/register" className="btn btn-primary me-2">Registrar Usuários</Link>
-            <Link to="/chamados" className="btn btn-primary me-2">Chamados</Link>
-            <Link to="/chamados/create" className="btn btn-primary">Criar Chamados</Link>
+            <Link to="/usuarios/login" className="btn btn-primary m-2">Entrar com Usuários</Link>
+            <Link to="/usuarios/register" className="btn btn-primary m-2">Registrar Usuários</Link>
+            <Link to="/chamados" className="btn btn-primary m-2">Chamados</Link>
+            <Link to="/chamados/create" className="btn btn-primary m-2">Criar Chamados</Link>
         </div>
     )
 }

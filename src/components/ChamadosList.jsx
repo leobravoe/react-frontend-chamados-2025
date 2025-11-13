@@ -97,6 +97,13 @@ const ChamadosList = () => {
         setChamados(newChamados);
     };
 
+    const onChamadoDelete = (chamadoDeletadoId) => {
+        const newChamados = chamados.filter((ch) =>
+            ch.id != chamadoDeletadoId
+        );
+        setChamados(newChamados);
+    };
+
     // Enquanto estiver carregando a primeira busca, mostra um placeholder simples.
     if (loading) {
         return <p>Carregando chamados...</p>;
@@ -131,6 +138,7 @@ const ChamadosList = () => {
                         chamado={chamado}
                         setError={setError}
                         onChamadoEstadoChange={onChamadoEstadoChange}
+                        onChamadoDelete={onChamadoDelete}
                     />
                 ))}
             </div>
