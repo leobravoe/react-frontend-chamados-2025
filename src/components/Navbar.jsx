@@ -1,6 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import ThemeButton from "./ThemeButton";
-import LoggedUser from "./LoggedUser";
+import NavbarLoggedUser from "./NavbarLoggedUser";
 
 export default function Navbar() {
     return (
@@ -14,7 +14,7 @@ export default function Navbar() {
                 {/* 2) Área da direita SEM participar do collapse */}
                 <div className="d-flex align-items-center ms-auto order-lg-3">
                     <ThemeButton />
-                    <LoggedUser />
+                    <NavbarLoggedUser />
 
                     {/* Botão de colapso do menu (só aparece em < lg) */}
                     <button

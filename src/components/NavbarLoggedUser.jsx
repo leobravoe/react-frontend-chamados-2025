@@ -3,7 +3,7 @@ import { useCurrentUser } from "../hooks/useCurrentUser";
 import { useAuthFetch } from "../hooks/useAuthFetch";
 import { useNavigate } from "react-router-dom";
 
-const LoggedUser = () => {
+const NavbarLoggedUser = () => {
     const currentUser = useCurrentUser();
     const navigate = useNavigate();
     const authFetch = useAuthFetch();
@@ -47,4 +47,4 @@ const LoggedUser = () => {
     );
 };
 
-export default LoggedUser;
+export default NavbarLoggedUser;
