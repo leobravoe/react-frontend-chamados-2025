@@ -26,6 +26,7 @@
 // -----------------------------------------------------------------------------
 // Abaixo está a implementação do componente, com comentários linha a linha.
 
+import { Link } from 'react-router-dom';
 import { useAuthFetch } from '../hooks/useAuthFetch';
 import { useCurrentUser } from '../hooks/useCurrentUser';
 
@@ -125,7 +126,7 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
                             }
                         />
                     )}
-                    <span>{chamado.texto}</span>
+                    <Link to={`/chamados/${chamado.id}`} className='text-body text-decoration-none'>{chamado.texto}</Link>
                 </div>
                 <div className="card-footer text-body-secondary">
                     {/* Botão que alterna o estado do chamado.
@@ -150,7 +151,7 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
                     )}
 
                     {/* Botões "Editar" e "Remover" estão presentes para futuras ações. */}
-                    {(currentUserId == chamado.Usuarios_id || currentUserIsAdmin) && <button className="btn btn-info me-2 text-white">Editar</button>}
+                    {(currentUserId == chamado.Usuarios_id || currentUserIsAdmin) && <Link to={`/chamados/${chamado.id}/edit`} className="btn btn-info me-2 text-white">Editar</Link>}
                     {(currentUserId == chamado.Usuarios_id || currentUserIsAdmin) && <button className="btn btn-danger me-2" onClick={handleChamadoDelete}>Remover</button>}
                 </div>
             </div>
