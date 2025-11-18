@@ -14,10 +14,13 @@ function filtrarPorEstado(lista, estado) {
 const ChamadosList = () => {
   // Lê cache do localStorage (se existir)
   let chamadosCache = null;
+  let chamadosEstadoSelecionadoCache = null;
   try {
     chamadosCache = JSON.parse(localStorage.getItem("chamadosCache"));
+    chamadosEstadoSelecionadoCache = JSON.parse(localStorage.getItem("chamadosEstadoSelecionadoCache"));
   } catch {
     chamadosCache = null;
+    chamadosEstadoSelecionadoCache = "a";
   }
 
   // allChamados = fonte de verdade (sempre a lista completa)
@@ -26,7 +29,7 @@ const ChamadosList = () => {
   const [filteredChamados, setFilteredChamados] = useState(chamadosCache ?? []);
   const [loading, setLoading] = useState(chamadosCache ? false : true);
   const [error, setError] = useState(null);
-  const [estadoFilter, setEstadoFilter] = useState("a"); // "", "a", "f"
+  const [estadoFilter, setEstadoFilter] = useState(chamadosEstadoSelecionadoCache); // "", "a", "f"
 
   const authFetch = useAuthFetch();
 
