@@ -34,7 +34,7 @@ const ChamadosShow = () => {
             }
         };
         fetchChamadoById();
-    }, [id]); // O array de dependências [id] garante que a busca será refeita se o id mudar
+    }, [id, authFetch]); // O array de dependências [id] garante que a busca será refeita se o id mudar
 
     // Se não tiver usuário logado, redireciona declarativamente
     if (!user) {

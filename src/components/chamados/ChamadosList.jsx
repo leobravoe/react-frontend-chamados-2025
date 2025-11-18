@@ -86,7 +86,7 @@ const ChamadosList = () => {
             abortController.abort();
             clearInterval(interval5secs);
         };
-    }, []); // [] = executa o efeito apenas uma vez, ao montar o componente.
+    }, [authFetch]); // [] = executa o efeito apenas uma vez, ao montar o componente.
 
     // Callback chamado pelo filho <Chamado /> quando um item foi atualizado no backend.
     // Substitui o item correspondente na lista local (mantém os demais).

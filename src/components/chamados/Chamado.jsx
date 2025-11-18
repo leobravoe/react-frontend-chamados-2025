@@ -28,7 +28,7 @@
 
 import { Link } from 'react-router-dom';
 import { useAuthFetch } from '../../auth/useAuthFetch';
-import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { useAuth } from '../../auth/useAuth';
 
 // Componente responsável por renderizar UM chamado da lista.
 // Props:
@@ -39,9 +39,9 @@ import { useCurrentUser } from '../../hooks/useCurrentUser';
 const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) => {
     // Obtém a função authFetch (um "fetch" com autenticação + refresh automático).
     const authFetch = useAuthFetch();
-    const currentUser = useCurrentUser();
-    const currentUserId = currentUser()?.sub;
-    const currentUserIsAdmin = currentUser()?.papel == 1;
+    const { user } = useAuth(); // agora vem do contexto
+    const currentUserId = user?.sub;
+    const currentUserIsAdmin = user?.papel == 1;
 
     // Handler do botão que alterna o estado do chamado (a <-> f).
     // a  = ativo/aberto
