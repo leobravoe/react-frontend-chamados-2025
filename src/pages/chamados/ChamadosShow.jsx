@@ -11,7 +11,7 @@ const ChamadosShow = () => {
     const [chamadoData, setChamadoData] = useState(null); // Armazena os dados do chamado
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const { user } = useAuth();
+   const { user, authLoading } = useAuth();
     const authFetch = useAuthFetch();
     // useEffect para buscar os dados da API quando o componente for montado ou o 'id' mudar.
     useEffect(() => {
@@ -35,6 +35,11 @@ const ChamadosShow = () => {
         };
         fetchChamadoById();
     }, [id, authFetch]); // O array de dependências [id] garante que a busca será refeita se o id mudar
+
+    // Enquanto ainda está carregando o estado de auth, não decide redirecionar
+    if (authLoading) {
+        return <p>Carregando usuário...</p>; // ou um spinner bonitinho
+    }
 
     // Se não tiver usuário logado, redireciona declarativamente
     if (!user) {

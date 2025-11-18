@@ -3,7 +3,6 @@
 const ChamadosListFilter = ({ value, onChange }) => {
   const handleFilterChange = (e) => {
     onChange(e.target.value); // "a", "f" ou ""
-    localStorage.setItem("chamadosEstadoSelecionadoCache", JSON.stringify(e.target.value));
   };
 
   return (

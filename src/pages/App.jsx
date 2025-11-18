@@ -5,7 +5,12 @@ import { useAuth } from "../auth/useAuth";
 
 // src/App.jsx
 const App = () => {
-    const { user } = useAuth(); // agora vem do contexto
+    const { user, authLoading } = useAuth();
+
+    // Enquanto ainda está carregando o estado de auth, não decide redirecionar
+    if (authLoading) {
+        return <p>Carregando usuário...</p>; // ou um spinner bonitinho
+    }
 
     return (
         <div>

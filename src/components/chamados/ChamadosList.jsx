@@ -14,32 +14,32 @@ function filtrarPorEstado(lista, estado) {
 const ChamadosList = () => {
   // Lê cache do localStorage (se existir)
   let chamadosCache = null;
-  let chamadosEstadoSelecionadoCache = null;
   try {
     chamadosCache = JSON.parse(localStorage.getItem("chamadosCache"));
-    chamadosEstadoSelecionadoCache = JSON.parse(localStorage.getItem("chamadosEstadoSelecionadoCache"));
   } catch {
     chamadosCache = null;
-    chamadosEstadoSelecionadoCache = "a";
   }
 
-  // allChamados = fonte de verdade (sempre a lista completa)
+  // filtro salvo em localStorage como string simples ("", "a", "f")
+  let estadoSelecionadoCache = localStorage.getItem(
+    "chamadosEstadoSelecionadoCache"
+  );
+  if (estadoSelecionadoCache === null) {
+    estadoSelecionadoCache = "a"; // padrão = "Abertos"
+  }
+
+  // Fonte de verdade: lista completa
   const [allChamados, setAllChamados] = useState(chamadosCache ?? []);
-  // filteredChamados = o que está sendo exibido (aplica filtro em cima de allChamados)
-  const [filteredChamados, setFilteredChamados] = useState(chamadosCache ?? []);
+
+  // Filtro selecionado pelo usuário
+  const [estadoFilter, setEstadoFilter] = useState(estadoSelecionadoCache); // "", "a", "f"
+
   const [loading, setLoading] = useState(chamadosCache ? false : true);
   const [error, setError] = useState(null);
-  const [estadoFilter, setEstadoFilter] = useState(chamadosEstadoSelecionadoCache); // "", "a", "f"
 
   const authFetch = useAuthFetch();
 
-  // Função helper para atualizar allChamados + filteredChamados + cache de forma consistente
-  const atualizarChamadosLocais = (novaLista) => {
-    setAllChamados(novaLista);
-    setFilteredChamados(filtrarPorEstado(novaLista, estadoFilter));
-    localStorage.setItem("chamadosCache", JSON.stringify(novaLista));
-  };
-
+  // 1) Efeito para BUSCAR os chamados da API periodicamente
   useEffect(() => {
     const abortController = new AbortController();
 
@@ -55,8 +55,9 @@ const ChamadosList = () => {
 
         const data = await res.json();
 
-        // Atualiza fonte de verdade + filtrado + cache
-        atualizarChamadosLocais(data);
+        // Atualiza a fonte de verdade e o cache bruto
+        setAllChamados(data);
+        localStorage.setItem("chamadosCache", JSON.stringify(data));
       } catch (error) {
         if (error?.name === "AbortError") return;
         setError(error.message);
@@ -72,14 +73,16 @@ const ChamadosList = () => {
       abortController.abort();
       clearInterval(interval5secs);
     };
-    // depende de authFetch e do filtro atual, para que novas listas vindas da API
-    // sejam aplicadas respeitando o filtro que o usuário escolheu
-  }, [authFetch, estadoFilter]);
+  }, [authFetch]);
+
+  // Lista exibida em tela é DERIVADA (não é estado próprio)
+  const chamadosVisiveis = filtrarPorEstado(allChamados, estadoFilter);
 
   // Quando o usuário troca o filtro no <ChamadosListFilter>
   const handleFilterChange = (novoEstado) => {
     setEstadoFilter(novoEstado);
-    setFilteredChamados(filtrarPorEstado(allChamados, novoEstado));
+    // salva o valor cru, sem JSON.stringify
+    localStorage.setItem("chamadosEstadoSelecionadoCache", novoEstado);
   };
 
   // Chamado alterado (ex.: mudou estado de "a" para "f")
@@ -88,8 +91,6 @@ const ChamadosList = () => {
       const novaLista = prev.map((ch) =>
         ch.id === chamadoAlterado.id ? chamadoAlterado : ch
       );
-      // reaplica filtro e atualiza cache
-      setFilteredChamados(filtrarPorEstado(novaLista, estadoFilter));
       localStorage.setItem("chamadosCache", JSON.stringify(novaLista));
       return novaLista;
     });
@@ -99,7 +100,6 @@ const ChamadosList = () => {
   const onChamadoDelete = (chamadoDeletadoId) => {
     setAllChamados((prev) => {
       const novaLista = prev.filter((ch) => ch.id !== chamadoDeletadoId);
-      setFilteredChamados(filtrarPorEstado(novaLista, estadoFilter));
       localStorage.setItem("chamadosCache", JSON.stringify(novaLista));
       return novaLista;
     });
@@ -115,11 +115,11 @@ const ChamadosList = () => {
 
       <ChamadosListFilter value={estadoFilter} onChange={handleFilterChange} />
 
-      {filteredChamados.length === 0 && (
+      {chamadosVisiveis.length === 0 && (
         <p className="mx-2">Nenhum chamado encontrado.</p>
       )}
 
-      {filteredChamados.map((chamado) => (
+      {chamadosVisiveis.map((chamado) => (
         <Chamado
           key={chamado.id}
           chamado={chamado}

@@ -6,7 +6,7 @@ import { useAuth } from "../../auth/useAuth";
 const NavbarLoggedUser = () => {
     const navigate = useNavigate();
     const authFetch = useAuthFetch();
-    const { user, setUser } = useAuth(); // agora vem do contexto
+    const { user, authLoading, setUser } = useAuth(); // agora vem do contexto
 
     const handleLogoutClick = async (e) => {
         e.preventDefault();
@@ -21,6 +21,11 @@ const NavbarLoggedUser = () => {
         } catch (error) {
             console.log(error);
         }
+    }
+
+    // Enquanto ainda está carregando o estado de auth, não decide redirecionar
+    if (authLoading) {
+        return null;
     }
 
     if (!user) {

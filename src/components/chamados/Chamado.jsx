@@ -39,7 +39,7 @@ import { useAuth } from '../../auth/useAuth';
 const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) => {
     // Obtém a função authFetch (um "fetch" com autenticação + refresh automático).
     const authFetch = useAuthFetch();
-    const { user } = useAuth(); // agora vem do contexto
+    const { user, authLoading } = useAuth(); // agora vem do contexto
     const currentUserId = user?.sub;
     const currentUserIsAdmin = user?.papel == 1;
 
@@ -105,6 +105,11 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
             setError(err?.message || 'Erro inesperado');
         }
     };
+
+    // Enquanto ainda está carregando o estado de auth, não decide redirecionar
+    if (authLoading) {
+        return null;
+    }
 
     // Abaixo está apenas a renderização do cartão do chamado (UI).
     return (

@@ -6,7 +6,12 @@ import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../auth/useAuth';
 
 const UsuariosRegister = () => {
-    const { user } = useAuth();
+    const { user, authLoading } = useAuth();
+
+    // Enquanto ainda está carregando o estado de auth, não decide redirecionar
+    if (authLoading) {
+        return <p>Carregando usuário...</p>; // ou um spinner bonitinho
+    }
 
     // Se tiver usuário logado, redireciona declarativamente
     if (user) {
