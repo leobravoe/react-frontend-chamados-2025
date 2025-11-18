@@ -1,5 +1,5 @@
 import { useAuth } from '../../auth/useAuth';
-import Navbar from '../../components/Navbar'
+import Navbar from '../../components/shared/Navbar'
 import ChamadosList from '../../components/chamados/ChamadosList'
 import { Link, Navigate } from 'react-router-dom';
 
@@ -15,8 +15,10 @@ const ChamadosIndex = () => {
         <div>
             <Navbar />
             <h1 className='mx-2'>ChamadosIndex.jsx</h1>
-            <Link to="/" className="btn btn-primary mx-2">Voltar</Link>
-            <Link to="/chamados/create" className='btn btn-primary'>Criar chamado</Link>
+            <div className='d-flex flex-wrap gap-2 mx-2'>
+                <Link to="/" className="btn btn-primary">Voltar</Link>
+                <Link to="/chamados/create" className='btn btn-primary'>Criar Chamado</Link>
+            </div>
             <ChamadosList />
         </div>
     );

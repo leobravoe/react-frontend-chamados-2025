@@ -1,5 +1,5 @@
 import { useAuth } from '../../auth/useAuth';
-import Navbar from '../../components/Navbar'
+import Navbar from '../../components/shared/Navbar'
 import ChamadoFormCreate from '../../components/chamados/ChamadoFormCreate'
 import { Link, Navigate } from 'react-router-dom';
 

@@ -1,133 +1,132 @@
 // src/components/ChamadosList.jsx
-//
-// OBJETIVO
-// -----------------------------------------------------------------------------
-// Este componente busca periodicamente a lista de "chamados" no backend,
-// guarda um cache no localStorage, mostra erros em um toast simples e
-// renderiza cada item usando o componente <Chamado />.
-//
-// -----------------------------------------------------------------------------
-// - useState: cria estados reativos para dados (chamados), loading e erro.
-// - useEffect: executa efeitos colaterais (ex.: buscar dados ao montar).
-// - AbortController: permite cancelar uma requisição fetch se o componente
-//   for desmontado (evita "state update on unmounted component").
-// - useAuthFetch: helper baseado em fetch que já:
-//     * Anexa Authorization: Bearer <access_token> (se existir em sessionStorage);
-//     * Envia cookies (refresh HttpOnly);
-//     * Tenta renovar o access token automaticamente quando a API responder 401;
-//     * Refaz a requisição original uma única vez após o refresh.
-// - localStorage: salva um "cache" da última lista para renderizar rápido
-//   (mesmo antes de a nova busca terminar).
 
-import { useState, useEffect } from 'react';
-import Chamado from './Chamado';
-import { useAuthFetch } from '../../auth/useAuthFetch';
-import Toast from '../Toast';
+import { useState, useEffect } from "react";
+import Chamado from "./Chamado";
+import { useAuthFetch } from "../../auth/useAuthFetch";
+import Toast from "../shared/Toast";
+import ChamadosListFilter from "./ChamadosListFilter";
+
+function filtrarPorEstado(lista, estado) {
+  if (!estado) return lista; // "" = todos
+  return lista.filter((ch) => ch.estado === estado);
+}
 
 const ChamadosList = () => {
-    // Tenta ler um cache previamente salvo (ou null se não houver).
-    const chamadosCache = JSON.parse(localStorage.getItem('chamadosCache'));
+  // Lê cache do localStorage (se existir)
+  let chamadosCache = null;
+  try {
+    chamadosCache = JSON.parse(localStorage.getItem("chamadosCache"));
+  } catch {
+    chamadosCache = null;
+  }
 
-    // Estados da tela:
-    // - chamados: a lista vinda da API (ou o cache inicial).
-    // - loading: exibe "Carregando..." enquanto a primeira busca acontece.
-    // - error: mensagem de erro para o toast (string ou null).
-    const [chamados, setChamados] = useState(chamadosCache ?? []);
-    const [loading, setLoading] = useState(chamadosCache ? false : true);
-    const [error, setError] = useState(null);
+  // allChamados = fonte de verdade (sempre a lista completa)
+  const [allChamados, setAllChamados] = useState(chamadosCache ?? []);
+  // filteredChamados = o que está sendo exibido (aplica filtro em cima de allChamados)
+  const [filteredChamados, setFilteredChamados] = useState(chamadosCache ?? []);
+  const [loading, setLoading] = useState(chamadosCache ? false : true);
+  const [error, setError] = useState(null);
+  const [estadoFilter, setEstadoFilter] = useState("a"); // "", "a", "f"
 
-    // Pega a função de busca autenticada (cuida de Bearer + refresh automático).
-    const authFetch = useAuthFetch();
+  const authFetch = useAuthFetch();
 
-    useEffect(() => {
-        // Controlador para permitir cancelar a(s) requisição(ões) se o componente desmontar.
-        const abortController = new AbortController();
+  // Função helper para atualizar allChamados + filteredChamados + cache de forma consistente
+  const atualizarChamadosLocais = (novaLista) => {
+    setAllChamados(novaLista);
+    setFilteredChamados(filtrarPorEstado(novaLista, estadoFilter));
+    localStorage.setItem("chamadosCache", JSON.stringify(novaLista));
+  };
 
-        // Função que efetivamente busca a lista na API.
-        const fetchChamados = async () => {
-            try {
-                // Faz GET usando o helper; passamos o signal do AbortController.
-                const res = await authFetch('http://localhost:3000/api/chamados', {
-                    method: 'GET',
-                    signal: abortController.signal,
-                });
+  useEffect(() => {
+    const abortController = new AbortController();
 
-                // Se não for 2xx, geramos um erro para cair no catch.
-                if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+    const fetchChamados = async () => {
+      try {
+        const res = await authFetch("http://localhost:3000/api/chamados", {
+          method: "GET",
+          signal: abortController.signal,
+        });
 
-                // Se o servidor respondeu 304 (sem mudanças), não atualiza estado/localStorage.
-                if (res.status === 304) return;
+        if (!res.ok) throw new Error(`Erro HTTP: ${res.status}`);
+        if (res.status === 304) return;
 
-                // Lê o corpo como JSON e atualiza a lista e o cache.
-                const data = await res.json();
-                setChamados(data);
-                localStorage.setItem('chamadosCache', JSON.stringify(data));
-            } catch (error) {
-                // Se o erro veio de um abort() (usuário saiu da tela, por ex.), apenas ignore.
-                if (error?.name === 'AbortError') return;
-                // Para qualquer outro erro, mostramos no toast.
-                setError(error.message);
-            } finally {
-                // Após a primeira tentativa (com sucesso ou erro), desliga o "Carregando...".
-                setLoading(false);
-            }
-        };
+        const data = await res.json();
 
-        // 1ª carga imediatamente ao montar.
-        fetchChamados();
-
-        // Atualiza a lista a cada 5s. Útil para "quase tempo real".
-        const interval5secs = setInterval(fetchChamados, 5000);
-
-        // Limpeza do efeito:
-        // - Cancela qualquer requisição em andamento;
-        // - Para o intervalo de atualizações.
-        return () => {
-            abortController.abort();
-            clearInterval(interval5secs);
-        };
-    }, [authFetch]); // [] = executa o efeito apenas uma vez, ao montar o componente.
-
-    // Callback chamado pelo filho <Chamado /> quando um item foi atualizado no backend.
-    // Substitui o item correspondente na lista local (mantém os demais).
-    const onChamadoEstadoChange = (chamadoAlterado) => {
-        const newChamados = chamados.map((ch) =>
-            ch.id == chamadoAlterado.id ? chamadoAlterado : ch
-        );
-        setChamados(newChamados);
+        // Atualiza fonte de verdade + filtrado + cache
+        atualizarChamadosLocais(data);
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    const onChamadoDelete = (chamadoDeletadoId) => {
-        const newChamados = chamados.filter((ch) =>
-            ch.id != chamadoDeletadoId
-        );
-        setChamados(newChamados);
+    fetchChamados();
+    const interval5secs = setInterval(fetchChamados, 5000);
+
+    return () => {
+      abortController.abort();
+      clearInterval(interval5secs);
     };
+    // depende de authFetch e do filtro atual, para que novas listas vindas da API
+    // sejam aplicadas respeitando o filtro que o usuário escolheu
+  }, [authFetch, estadoFilter]);
 
-    // Enquanto estiver carregando a primeira busca, mostra um placeholder simples.
-    if (loading) {
-        return <p>Carregando chamados...</p>;
-    }
+  // Quando o usuário troca o filtro no <ChamadosListFilter>
+  const handleFilterChange = (novoEstado) => {
+    setEstadoFilter(novoEstado);
+    setFilteredChamados(filtrarPorEstado(allChamados, novoEstado));
+  };
 
-    // Renderização principal:
-    // - Se existir "error", renderiza um toast (usa classes de estilo do Bootstrap).
-    // - Mapeia a lista e renderiza um <Chamado /> por item.
-    return (
-        <div>
-            {error && <Toast error={error} setError={setError} />}
-            <div>
-                {chamados.map((chamado) => (
-                    <Chamado
-                        key={chamado.id}
-                        chamado={chamado}
-                        setError={setError}
-                        onChamadoEstadoChange={onChamadoEstadoChange}
-                        onChamadoDelete={onChamadoDelete}
-                    />
-                ))}
-            </div>
-        </div>
-    );
+  // Chamado alterado (ex.: mudou estado de "a" para "f")
+  const onChamadoEstadoChange = (chamadoAlterado) => {
+    setAllChamados((prev) => {
+      const novaLista = prev.map((ch) =>
+        ch.id === chamadoAlterado.id ? chamadoAlterado : ch
+      );
+      // reaplica filtro e atualiza cache
+      setFilteredChamados(filtrarPorEstado(novaLista, estadoFilter));
+      localStorage.setItem("chamadosCache", JSON.stringify(novaLista));
+      return novaLista;
+    });
+  };
+
+  // Chamado deletado
+  const onChamadoDelete = (chamadoDeletadoId) => {
+    setAllChamados((prev) => {
+      const novaLista = prev.filter((ch) => ch.id !== chamadoDeletadoId);
+      setFilteredChamados(filtrarPorEstado(novaLista, estadoFilter));
+      localStorage.setItem("chamadosCache", JSON.stringify(novaLista));
+      return novaLista;
+    });
+  };
+
+  if (loading) {
+    return <p>Carregando chamados...</p>;
+  }
+
+  return (
+    <div>
+      {error && <Toast error={error} setError={setError} />}
+
+      <ChamadosListFilter value={estadoFilter} onChange={handleFilterChange} />
+
+      {filteredChamados.length === 0 && (
+        <p className="mx-2">Nenhum chamado encontrado.</p>
+      )}
+
+      {filteredChamados.map((chamado) => (
+        <Chamado
+          key={chamado.id}
+          chamado={chamado}
+          setError={setError}
+          onChamadoEstadoChange={onChamadoEstadoChange}
+          onChamadoDelete={onChamadoDelete}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default ChamadosList;

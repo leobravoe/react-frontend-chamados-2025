@@ -26,7 +26,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuthFetch } from '../../auth/useAuthFetch';
-import Toast from '../Toast';
+import Toast from '../shared/Toast';
 
 /**
  * Componente de formulário para criar um novo chamado.

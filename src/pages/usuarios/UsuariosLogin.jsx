@@ -1,6 +1,6 @@
 // src/pages/usuarios/UsuariosLogin.jsx
 import { Link } from "react-router-dom";
-import Navbar from "../../components/Navbar";
+import Navbar from "../../components/shared/Navbar";
 import UsuariosFormLogin from "../../components/usuarios/UsuarioFormLogin";
 import { Navigate } from 'react-router-dom';
 import { useAuth } from "../../auth/useAuth";

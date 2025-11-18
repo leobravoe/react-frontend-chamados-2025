@@ -1,6 +1,6 @@
 // src/pages/usuarios/UsuariosRegister.jsx
 import { Link } from 'react-router-dom'
-import Navbar from "../../components/Navbar"
+import Navbar from "../../components/shared/Navbar"
 import UsuariosFormRegister from '../../components/usuarios/UsuarioFormRegister'
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../../auth/useAuth';

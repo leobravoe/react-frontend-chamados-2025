@@ -1,4 +1,4 @@
-import Navbar from '../../components/Navbar'
+import Navbar from '../../components/shared/Navbar'
 import ChamadoShow from '../../components/chamados/ChamadoShow'
 import { useState, useEffect } from 'react';
 import { Link, useParams, Navigate } from 'react-router-dom';

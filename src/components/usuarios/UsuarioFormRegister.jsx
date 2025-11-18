@@ -25,7 +25,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
-import Toast from "../Toast";
+import Toast from "../shared/Toast";
 import { useAuth } from "../../auth/useAuth";
 
 const UsuariosFormRegister = () => {
