@@ -2,12 +2,12 @@
 import { createContext, useEffect, useState } from "react";
 import { jwtDecode } from "jwt-decode";
 
-export const AuthContext = createContext({
+const AuthContext = createContext({
     user: null,
     setUser: () => { },
 });
 
-export function AuthProvider({ children }) {
+const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
@@ -39,3 +39,5 @@ export function AuthProvider({ children }) {
         </AuthContext.Provider>
     );
 }
+
+export { AuthContext, AuthProvider };
