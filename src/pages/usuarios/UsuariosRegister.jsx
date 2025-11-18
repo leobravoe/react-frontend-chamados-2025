@@ -1,13 +1,12 @@
 // src/pages/usuarios/UsuariosRegister.jsx
 import { Link } from 'react-router-dom'
 import Navbar from "../../components/Navbar"
-import UsuariosFormRegister from '../../components/UsuariosFormRegister'
-import { useCurrentUser } from "../../hooks/useCurrentUser";
+import UsuariosFormRegister from '../../components/usuarios/UsuarioFormRegister'
 import { Navigate } from 'react-router-dom';
+import { useAuth } from '../../auth/useAuth';
 
 const UsuariosRegister = () => {
-    const currentUser = useCurrentUser();
-    const user = currentUser();
+    const { user } = useAuth();
 
     // Se tiver usuário logado, redireciona declarativamente
     if (user) {

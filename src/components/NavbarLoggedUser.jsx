@@ -1,13 +1,12 @@
 // LoggedUser.jsx
-import { useCurrentUser } from "../hooks/useCurrentUser";
-import { useAuthFetch } from "../hooks/useAuthFetch";
-import { useNavigate } from "react-router-dom";
+import { useAuthFetch } from "../auth/useAuthFetch";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/useAuth";
 
 const NavbarLoggedUser = () => {
-    const currentUser = useCurrentUser();
     const navigate = useNavigate();
     const authFetch = useAuthFetch();
-    const user = currentUser();
+    const { user, setUser } = useAuth(); // agora vem do contexto
 
     const handleLogoutClick = async (e) => {
         e.preventDefault();
@@ -17,13 +16,40 @@ const NavbarLoggedUser = () => {
                 credentials: "include"
             });
             sessionStorage.removeItem("at");
+            setUser(null);
             navigate("/");
         } catch (error) {
             console.log(error);
         }
     }
 
-    if (!user) return null;
+    if (!user) {
+        return (
+            <ul className="nav-item dropdown m-0 p-0">
+                <button
+                    className="nav-link dropdown-toggle bg-transparent border-0"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                >
+                    Usuário Desconectado
+                </button>
+
+                <ul className="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <Link className="dropdown-item text-center" type="button" to="/usuarios/login">
+                            Entrar
+                        </Link>
+                    </li>
+                    <li>
+                        <Link className="dropdown-item text-center" type="button" to="/usuarios/register">
+                            Registrar
+                        </Link>
+                    </li>
+                </ul>
+            </ul>
+        );
+    }
 
     return (
         <ul className="nav-item dropdown m-0 p-0">

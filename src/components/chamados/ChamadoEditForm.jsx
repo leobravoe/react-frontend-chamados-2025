@@ -1,12 +1,14 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useAuthFetch } from '../hooks/useAuthFetch';
+import { useAuthFetch } from '../../auth/useAuthFetch';
+import Toast from '../Toast';
 
 const ChamadoEditForm = ({ chamado }) => {
     const [texto, setTexto] = useState(chamado.texto);
     const [estado, setEstado] = useState(chamado.estado);
     const [imagem, setImagem] = useState(null);
     const [hasImagem, setHasImagem] = useState(chamado.url_imagem ? true : false);
+    const [error, setError] = useState(null);
     const navigate = useNavigate();
     const authFetch = useAuthFetch();
 
@@ -43,8 +45,9 @@ const ChamadoEditForm = ({ chamado }) => {
             navigate(`/chamados`);
 
         } catch (error) {
-            console.error("Falha ao atualizar o chamado:", error);
-            // Aqui você poderia exibir uma notificação de erro para o usuário
+            // Se a requisição foi cancelada com AbortController, ignore.
+            // Caso contrário, exiba a mensagem no toast.
+            if (error?.name !== 'AbortError') setError(error.message);
         }
     }
 
@@ -70,13 +73,17 @@ const ChamadoEditForm = ({ chamado }) => {
             setHasImagem(false);
 
         } catch (error) {
-            console.error("Falha ao atualizar o chamado:", error);
-            // Aqui você poderia exibir uma notificação de erro para o usuário
+            // Se a requisição foi cancelada com AbortController, ignore.
+            // Caso contrário, exiba a mensagem no toast.
+            if (error?.name !== 'AbortError') setError(error.message);
         }
     };
 
     return (
         <form onSubmit={submitForm} className='m-2'>
+            {/* Toast de erro simples. Fica visível quando "error" tem conteúdo. */}
+            {error && <Toast error={error} setError={setError} />}
+
             <div className='my-2'>
                 <label htmlFor="id-input-texto" className='form-label'>Texto</label>
                 <input className="form-control" type="text" id="id-input-texto" value={texto} onChange={(e) => setTexto(e.target.value)} placeholder='Digite o texto do chamado' />

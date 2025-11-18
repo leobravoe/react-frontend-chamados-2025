@@ -1,11 +1,10 @@
+import { useAuth } from '../../auth/useAuth';
 import Navbar from '../../components/Navbar'
-import ChamadoFormCreate from '../../components/ChamadoFormCreate'
-import { useCurrentUser } from "../../hooks/useCurrentUser";
+import ChamadoFormCreate from '../../components/chamados/ChamadoFormCreate'
 import { Link, Navigate } from 'react-router-dom';
 
 const ChamadosCreate = () => {
-    const currentUser = useCurrentUser();
-    const user = currentUser();
+    const { user } = useAuth(); // agora vem do contexto
 
     // Se não tiver usuário logado, redireciona declarativamente
     if (!user) {

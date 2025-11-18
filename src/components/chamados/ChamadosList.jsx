@@ -21,7 +21,8 @@
 
 import { useState, useEffect } from 'react';
 import Chamado from './Chamado';
-import { useAuthFetch } from '../hooks/useAuthFetch';
+import { useAuthFetch } from '../../auth/useAuthFetch';
+import Toast from '../Toast';
 
 const ChamadosList = () => {
     // Tenta ler um cache previamente salvo (ou null se não houver).
@@ -61,12 +62,11 @@ const ChamadosList = () => {
                 const data = await res.json();
                 setChamados(data);
                 localStorage.setItem('chamadosCache', JSON.stringify(data));
-            } catch (err) {
+            } catch (error) {
                 // Se o erro veio de um abort() (usuário saiu da tela, por ex.), apenas ignore.
-                if (err?.name === 'AbortError') return;
-
+                if (error?.name === 'AbortError') return;
                 // Para qualquer outro erro, mostramos no toast.
-                setError(err.message);
+                setError(error.message);
             } finally {
                 // Após a primeira tentativa (com sucesso ou erro), desliga o "Carregando...".
                 setLoading(false);
@@ -114,23 +114,7 @@ const ChamadosList = () => {
     // - Mapeia a lista e renderiza um <Chamado /> por item.
     return (
         <div>
-            {error && <div className="toast-container position-fixed bottom-0 end-0 p-3">
-                <div className="toast text-bg-danger bg-opacity-50 show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div className="toast-header">
-                        <strong className="me-auto">Erro</strong>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            aria-label="Close"
-                            onClick={() => setError(null)}
-                        >
-                        </button>
-                    </div>
-                    <div className="toast-body">
-                        {error}
-                    </div>
-                </div>
-            </div>}
+            {error && <Toast error={error} setError={setError} />}
             <div>
                 {chamados.map((chamado) => (
                     <Chamado

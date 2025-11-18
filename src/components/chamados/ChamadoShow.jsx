@@ -2,7 +2,7 @@ const ChamadoShow = ({ chamado }) => {
     const Usuarios_id = chamado.Usuarios_id;
     const texto = chamado.texto;
     const estado = chamado.estado;
-    const hasImagem = chamado.urlImagem ? true : false;
+    const hasImagem = chamado.url_imagem ? true : false;
 
     return (
         <div className='m-2'>
@@ -24,10 +24,10 @@ const ChamadoShow = ({ chamado }) => {
                     <>
                         <label htmlFor="id-input-imagem" className='form-label d-block'>Imagem</label>
                         <div className='d-inline-flex gap-2'>
-                            {chamado.urlImagem && (
+                            {chamado.url_imagem && (
                                 <>
                                     <img
-                                        src={chamado.urlImagem}
+                                        src={chamado.url_imagem}
                                         alt={`Imagem do chamado ${chamado.id}`}
                                         onError={(e) => {
                                             // Para evitar loops infinitos caso a imagem de fallback também falhe

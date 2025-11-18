@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import Navbar from '../../components/Navbar';
-import ChamadoEditForm from '../../components/ChamadoEditForm';
-import { Link, useParams } from 'react-router-dom';
-import { useAuthFetch } from '../../hooks/useAuthFetch';
+import ChamadoEditForm from '../../components/chamados/ChamadoEditForm';
+import { Link, useParams, Navigate } from 'react-router-dom';
+import { useAuthFetch } from '../../auth/useAuthFetch';
+import { useAuth } from '../../auth/useAuth';
 
 const ChamadosEdit = () => {
     // Pega o 'id' da URL, como você já fez.
@@ -12,6 +13,7 @@ const ChamadosEdit = () => {
     const [chamadoData, setChamadoData] = useState(null); // Armazena os dados do chamado
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const { user } = useAuth();
     const authFetch = useAuthFetch();
 
     // useEffect para buscar os dados da API quando o componente for montado ou o 'id' mudar.
@@ -43,31 +45,25 @@ const ChamadosEdit = () => {
         fetchChamadoById();
     }, [id]); // O array de dependências [id] garante que a busca será refeita se o id mudar
 
-    // Renderização condicional com base no estado da busca
-    const renderContent = () => {
-        if (loading) {
-            return <p>Carregando formulário...</p>;
-        }
+    // Se não tiver usuário logado, redireciona declarativamente
+    if (!user) {
+        return <Navigate to="/usuarios/login" replace />;
+    }
 
-        if (error) {
-            return <p style={{ color: 'red' }}>Erro: {error}</p>;
-        }
+    if (loading) {
+        return <p>Carregando formulário...</p>;
+    }
 
-        // Se não está carregando e não há erro, e os dados existem, renderiza o formulário
-        if (chamadoData) {
-            // Passamos os dados buscados como uma prop para o formulário
-            return <ChamadoEditForm chamado={chamadoData} />;
-        }
-
-        return null; // Ou uma mensagem de "Nenhum dado encontrado"
-    };
+    if (error) {
+        return <p style={{ color: 'red' }}>Erro: {error}</p>;
+    }
 
     return (
         <div>
             <Navbar />
             <h1 className='mx-2'>ChamadosEdit.jsx</h1>
             <Link to="/chamados" className="btn btn-primary mx-2">Voltar</Link>
-            {renderContent()}
+            <ChamadoEditForm chamado={chamadoData} />
         </div>
     );
 };

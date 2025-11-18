@@ -1,13 +1,12 @@
 // src/pages/usuarios/UsuariosLogin.jsx
 import { Link } from "react-router-dom";
 import Navbar from "../../components/Navbar";
-import UsuariosFormLogin from "../../components/UsuariosFormLogin";
-import { useCurrentUser } from "../../hooks/useCurrentUser";
+import UsuariosFormLogin from "../../components/usuarios/UsuarioFormLogin";
 import { Navigate } from 'react-router-dom';
+import { useAuth } from "../../auth/useAuth";
 
 const UsuariosLogin = () => {
-    const currentUser = useCurrentUser();
-    const user = currentUser();
+    const { user } = useAuth();
 
     // Se tiver usuário logado, redireciona declarativamente
     if (user) {

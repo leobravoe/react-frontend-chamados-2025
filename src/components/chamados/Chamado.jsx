@@ -27,8 +27,8 @@
 // Abaixo está a implementação do componente, com comentários linha a linha.
 
 import { Link } from 'react-router-dom';
-import { useAuthFetch } from '../hooks/useAuthFetch';
-import { useCurrentUser } from '../hooks/useCurrentUser';
+import { useAuthFetch } from '../../auth/useAuthFetch';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
 
 // Componente responsável por renderizar UM chamado da lista.
 // Props:

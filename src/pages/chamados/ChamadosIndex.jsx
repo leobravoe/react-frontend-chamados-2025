@@ -1,12 +1,10 @@
-import React from 'react'
+import { useAuth } from '../../auth/useAuth';
 import Navbar from '../../components/Navbar'
-import ChamadosList from '../../components/ChamadosList'
-import { useCurrentUser } from "../../hooks/useCurrentUser";
+import ChamadosList from '../../components/chamados/ChamadosList'
 import { Link, Navigate } from 'react-router-dom';
 
 const ChamadosIndex = () => {
-    const currentUser = useCurrentUser();
-    const user = currentUser();
+    const { user } = useAuth();
 
     // Se não tiver usuário logado, redireciona declarativamente
     if (!user) {

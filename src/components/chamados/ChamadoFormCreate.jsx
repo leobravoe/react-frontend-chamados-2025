@@ -25,7 +25,8 @@
 
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
-import { useAuthFetch } from '../hooks/useAuthFetch';
+import { useAuthFetch } from '../../auth/useAuthFetch';
+import Toast from '../Toast';
 
 /**
  * Componente de formulário para criar um novo chamado.
@@ -78,10 +79,10 @@ const ChamadoFormCreate = () => {
 
             // Sucesso! Redireciona para a lista de chamados.
             navigate("/chamados");
-        } catch (err) {
+        } catch (error) {
             // Se a requisição foi cancelada com AbortController, ignore.
             // Caso contrário, exiba a mensagem no toast.
-            if (err?.name !== 'AbortError') setError(err.message);
+            if (error?.name !== 'AbortError') setError(error.message);
         }
     }
 
@@ -89,25 +90,9 @@ const ChamadoFormCreate = () => {
     // Dica: os valores “value” dos inputs vêm dos estados; “onChange” atualiza os estados.
     return (
         <form onSubmit={handleSubmit} className='m-2' encType="multipart/form-data">
+            
             {/* Toast de erro simples. Fica visível quando "error" tem conteúdo. */}
-            {error && <div className="toast-container position-fixed bottom-0 end-0 p-3">
-                <div className="toast text-bg-danger bg-opacity-50 show" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div className="toast-header">
-                        <strong className="me-auto">Erro</strong>
-                        {/* Botão para fechar o toast limpando o estado de erro */}
-                        <button
-                            type="button"
-                            className="btn-close"
-                            aria-label="Close"
-                            onClick={() => setError(null)}
-                        >
-                        </button>
-                    </div>
-                    <div className="toast-body">
-                        {error}
-                    </div>
-                </div>
-            </div>}
+            {error && <Toast error={error} setError={setError} />}
 
             {/* Campo de texto principal do chamado */}
             <div className='my-2'>
