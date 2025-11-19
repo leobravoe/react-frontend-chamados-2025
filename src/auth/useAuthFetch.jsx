@@ -9,80 +9,80 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 const useAuthFetch = () => {
-  const navigate = useNavigate();
+    const navigate = useNavigate();
 
-  const authFetch = useCallback(
-    /**
-     * authFetch(url, fetchOptions)
-     * @param {string} url                URL absoluta para a API.
-     * @param {RequestInit} fetchOptions  Mesmo objeto do fetch nativo (method, headers, body, signal, etc.).
-     * @returns {Promise<Response>}       Response do fetch. Se 401 e o refresh tiver sucesso, refaz 1x e retorna a nova Response.
-     */
-    async (url, fetchOptions = {}) => {
-      const { signal, headers: originalHeaders, ...restOptions } = fetchOptions;
+    const authFetch = useCallback(
+        /**
+         * authFetch(url, fetchOptions)
+         * @param {string} url                URL absoluta para a API.
+         * @param {RequestInit} fetchOptions  Mesmo objeto do fetch nativo (method, headers, body, signal, etc.).
+         * @returns {Promise<Response>}       Response do fetch. Se 401 e o refresh tiver sucesso, refaz 1x e retorna a nova Response.
+         */
+        async (url, fetchOptions = {}) => {
+            const { signal, headers: originalHeaders, ...restOptions } = fetchOptions;
 
-      // Monta os headers com qualquer valor que o chamador tenha passado,
-      // e adiciona "Authorization: Bearer <access_token>" se existir em sessionStorage.
-      const headers = new Headers(originalHeaders || {});
-      const accessToken = sessionStorage.getItem("at");
-      if (accessToken) {
-        headers.set("Authorization", `Bearer ${accessToken}`);
-      }
+            // Monta os headers com qualquer valor que o chamador tenha passado,
+            // e adiciona "Authorization: Bearer <access_token>" se existir em sessionStorage.
+            const headers = new Headers(originalHeaders || {});
+            const accessToken = sessionStorage.getItem("at");
+            if (accessToken) {
+                headers.set("Authorization", `Bearer ${accessToken}`);
+            }
 
-      // Opções base para o fetch (usadas tanto na 1ª quanto na 2ª tentativa)
-      const baseOptions = {
-        ...restOptions,
-        signal,
-        // se quiser que SEMPRE envie cookies, pode descomentar:
-        // credentials: "include",
-      };
+            // Opções base para o fetch (usadas tanto na 1ª quanto na 2ª tentativa)
+            const baseOptions = {
+                ...restOptions,
+                signal,
+                // se quiser que SEMPRE envie cookies, pode descomentar:
+                // credentials: "include",
+            };
 
-      // 1ª tentativa de requisição
-      let res = await fetch(url, { ...baseOptions, headers });
+            // 1ª tentativa de requisição
+            let res = await fetch(url, { ...baseOptions, headers });
 
-      // Se NÃO for 401, devolve a resposta imediatamente (200/201/204/403/404/500, etc.)
-      if (res.status !== 401) {
-        return res;
-      }
+            // Se NÃO for 401, devolve a resposta imediatamente (200/201/204/403/404/500, etc.)
+            if (res.status !== 401) {
+                return res;
+            }
 
-      // 401 → tenta renovar o access token usando o refresh token (cookie HttpOnly)
-      const refreshRes = await fetch("http://localhost:3000/api/usuarios/refresh", {
-        method: "POST",
-        credentials: "include", // envia cookie HttpOnly do refresh
-        signal,
-      });
+            // 401 → tenta renovar o access token usando o refresh token (cookie HttpOnly)
+            const refreshRes = await fetch("http://localhost:3000/api/usuarios/refresh", {
+                method: "POST",
+                credentials: "include", // envia cookie HttpOnly do refresh
+                signal,
+            });
 
-      // Falha ao renovar (ex.: refresh expirado/inválido) → limpa access token e vai para login
-      if (!refreshRes.ok) {
-        sessionStorage.removeItem("at");
-        navigate("/usuarios/login", { replace: true });
-        return res; // mantém a Response 401 original
-      }
+            // Falha ao renovar (ex.: refresh expirado/inválido) → limpa access token e vai para login
+            if (!refreshRes.ok) {
+                sessionStorage.removeItem("at");
+                navigate("/usuarios/login", { replace: true });
+                return res; // mantém a Response 401 original
+            }
 
-      // Tenta extrair o novo access token do corpo da resposta do /refresh
-      const data = await refreshRes.json().catch(() => ({}));
-      const newAccessToken = data?.access_token;
+            // Tenta extrair o novo access token do corpo da resposta do /refresh
+            const data = await refreshRes.json().catch(() => ({}));
+            const newAccessToken = data?.access_token;
 
-      // Se não veio token, trata como sessão inválida/expirada
-      if (!newAccessToken) {
-        sessionStorage.removeItem("at");
-        navigate("/usuarios/login", { replace: true });
-        return res;
-      }
+            // Se não veio token, trata como sessão inválida/expirada
+            if (!newAccessToken) {
+                sessionStorage.removeItem("at");
+                navigate("/usuarios/login", { replace: true });
+                return res;
+            }
 
-      // Guarda o novo access token e refaz a requisição original **apenas uma vez**
-      sessionStorage.setItem("at", newAccessToken);
-      headers.set("Authorization", `Bearer ${newAccessToken}`);
+            // Guarda o novo access token e refaz a requisição original **apenas uma vez**
+            sessionStorage.setItem("at", newAccessToken);
+            headers.set("Authorization", `Bearer ${newAccessToken}`);
 
-      // 2ª tentativa (após refresh bem-sucedido)
-      res = await fetch(url, { ...baseOptions, headers });
+            // 2ª tentativa (após refresh bem-sucedido)
+            res = await fetch(url, { ...baseOptions, headers });
 
-      return res;
-    },
-    [navigate] // se o navigate mudar, a função é recriada
-  );
+            return res;
+        },
+        [navigate] // se o navigate mudar, a função é recriada
+    );
 
-  return authFetch;
+    return authFetch;
 };
 
 export { useAuthFetch };
