@@ -4,93 +4,61 @@ import ReCAPTCHA from "react-google-recaptcha";
 
 const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
+// Lê o tema atual do Bootstrap a partir do <html>
 const getBootstrapTheme = () => {
   if (typeof document === "undefined") return "light";
 
-  const theme =
-    document.documentElement.getAttribute("data-bs-theme") || "light";
+  const html = document.documentElement;
+  const attr = html.getAttribute("data-bs-theme");
 
-  return theme === "dark" ? "dark" : "light";
-};
-
-const isSmallScreen = () => {
-  if (typeof window === "undefined") return false;
-  return window.innerWidth <= 576;
-};
-
-const getZoomScale = () => {
-  if (typeof window === "undefined" || !window.devicePixelRatio) return 1;
-  return window.devicePixelRatio;
+  // Qualquer coisa diferente de "dark" tratamos como "light"
+  return attr === "dark" ? "dark" : "light";
 };
 
 const ReCaptcha = ({ setCaptchaToken }) => {
   const [recaptchaTheme, setRecaptchaTheme] = useState(getBootstrapTheme());
-  const [smallScreen, setSmallScreen] = useState(isSmallScreen());
-  const [zoomScale, setZoomScale] = useState(getZoomScale());
   const wrapperRef = useRef(null);
 
-  // Sincroniza o tema com o <html data-bs-theme="...">
+  // Mantém o tema sincronizado com <html data-bs-theme="...">
   useEffect(() => {
     const updateTheme = () => {
       setRecaptchaTheme(getBootstrapTheme());
     };
 
+    // 1) Sincroniza imediatamente após o mount
+    //    (pega o valor final que o script de tema já tiver aplicado)
     updateTheme();
 
-    const observer = new MutationObserver(updateTheme);
-
-    observer.observe(document.documentElement, {
+    // 2) Observa mudanças futuras no atributo data-bs-theme
+    const obs = new MutationObserver(updateTheme);
+    obs.observe(document.documentElement, {
       attributes: true,
       attributeFilter: ["data-bs-theme"],
     });
 
-    return () => observer.disconnect();
-  }, []);
-
-  // Observa largura de tela e zoom (devicePixelRatio) para mobile + bordas
-  useEffect(() => {
-    const handleResizeOrZoom = () => {
-      setSmallScreen(isSmallScreen());
-      setZoomScale(getZoomScale());
-    };
-
-    window.addEventListener("resize", handleResizeOrZoom);
-    return () => window.removeEventListener("resize", handleResizeOrZoom);
+    return () => obs.disconnect();
   }, []);
 
   // Remove borda padrão do iframe do reCAPTCHA
   useEffect(() => {
     if (!wrapperRef.current) return;
 
-    const applyIframeStyles = () => {
+    const apply = () => {
       const iframe = wrapperRef.current.querySelector(
         "iframe[src*='recaptcha']"
       );
       if (!iframe) return;
-
       iframe.style.border = "none";
       iframe.style.borderRadius = "0";
     };
 
-    applyIframeStyles();
+    apply();
 
-    const mo = new MutationObserver(applyIframeStyles);
-    mo.observe(wrapperRef.current, {
-      childList: true,
-      subtree: true,
-    });
+    const mo = new MutationObserver(apply);
+    mo.observe(wrapperRef.current, { childList: true, subtree: true });
 
     return () => mo.disconnect();
   }, [recaptchaTheme]);
-
-  // Escala suave em mobile para evitar overflow horizontal
-  useEffect(() => {
-    if (!wrapperRef.current) return;
-
-    const wrapper = wrapperRef.current;
-    wrapper.style.transformOrigin = "top left";
-    wrapper.style.transform = smallScreen ? "scale(0.9)" : "none";
-  }, [smallScreen]);
 
   const handleCaptchaChange = (token) => {
     setCaptchaToken(token);
@@ -98,18 +66,26 @@ const ReCaptcha = ({ setCaptchaToken }) => {
 
   // Cores principais
   const bgColor = recaptchaTheme === "dark" ? "#222" : "#f9f9f9";
-  const maskColor = recaptchaTheme === "dark" ? "#222222" : "#f9f9f9";
 
-  // Container que envolve o iframe
+  // Parametrização da “moldura”
+  const FRAME_PADDING = 8;     // quanto o container é maior que o recaptcha
+  const OVERLAY_INSET = 4;     // quão “pra dentro” começa o overlay
+  const FRAME_THICKNESS = 10;  // espessura da borda interna opaca
+
+  // Container que envolve o iframe (um pouco maior que o reCAPTCHA)
   const containerStyle = {
     display: "inline-block",
+    position: "relative",
     lineHeight: 0,
     overflow: "hidden",
-    position: "relative",
     backgroundColor: bgColor,
+    paddingTop: `${FRAME_PADDING}px`,
+    paddingRight: `${FRAME_PADDING}px`,
+    paddingBottom: `${FRAME_PADDING}px`,
+    paddingLeft: `${FRAME_PADDING}px`,
   };
 
-  // Wrapper externo (borda arredondada + fundo de acordo com o tema)
+  // Wrapper externo (apenas para respeitar o layout com padding BootStrap)
   const outerWrapperStyle = {
     borderRadius: "0.9rem",
     overflow: "hidden",
@@ -118,64 +94,28 @@ const ReCaptcha = ({ setCaptchaToken }) => {
     lineHeight: 0,
   };
 
-  const edgeBaseStyle = {
+  // Overlay por cima do recaptcha:
+  // - centro transparente (mostra o widget)
+  // - borda interna opaca que "come" as laterais/anti-alias
+  const overlayStyle = {
     position: "absolute",
-    backgroundColor: maskColor,
+    inset: OVERLAY_INSET,
     pointerEvents: "none",
-  };
-
-  // ----------------- CÁLCULOS DE ESPESSURA / OFFSET -----------------
-  // Base pensada para zoom ~1; escala conforme devicePixelRatio,
-  // com limites para não ficar fino demais nem grosso demais.
-  const baseThickness = 8;
-
-  // Inset negativo "come" a borda do widget.
-  const baseInset = -(baseThickness/2); // px
-
-  const topMaskStyle = {
-    ...edgeBaseStyle,
-    top: baseInset,
-    left: 0,
-    right: 0,
-    height: `${baseThickness}px`,
-  };
-
-  const bottomMaskStyle = {
-    ...edgeBaseStyle,
-    bottom: baseInset,
-    left: 0,
-    right: 0,
-    height: `${baseThickness}px`,
-  };
-
-  const leftMaskStyle = {
-    ...edgeBaseStyle,
-    top: 0,
-    bottom: 0,
-    left: baseInset,
-    width: `${baseThickness}px`,
-  };
-
-  const rightMaskStyle = {
-    ...edgeBaseStyle,
-    top: 0,
-    bottom: 0,
-    right: baseInset,
-    width: `${baseThickness}px`,
+    boxShadow: `0 0 0 ${FRAME_THICKNESS}px ${bgColor} inset`,
   };
 
   const labelStyle = {
     fontSize: "0.8rem",
     textTransform: "uppercase",
     fontWeight: 600,
-    marginBottom: "0.25rem",
     color: "var(--bs-secondary-color)",
+    marginBottom: "0.25rem",
   };
 
   const helpTextStyle = {
     fontSize: "0.8rem",
-    marginTop: "0.25rem",
     color: "var(--bs-secondary-color)",
+    marginTop: "0.25rem",
   };
 
   return (
@@ -191,11 +131,8 @@ const ReCaptcha = ({ setCaptchaToken }) => {
             theme={recaptchaTheme}
           />
 
-          {/* Máscaras sobrepostas nas bordas */}
-          <div id="id-1" style={topMaskStyle} />
-          <div id="id-2" style={bottomMaskStyle} />
-          <div id="id-3" style={leftMaskStyle} />
-          <div id="id-4" style={rightMaskStyle} />
+          {/* Overlay oca com bordas internas arredondadas e opacas */}
+          <div id="overlay" style={overlayStyle} />
         </div>
       </div>
 
