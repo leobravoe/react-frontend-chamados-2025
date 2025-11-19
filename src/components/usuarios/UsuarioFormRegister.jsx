@@ -27,142 +27,168 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Toast from "../shared/Toast";
 import { useAuth } from "../../auth/useAuth";
+import ReCaptcha from "../shared/ReCAPTCHA";
 
 const UsuariosFormRegister = () => {
-  // Estados controlando os inputs e a UI:
-  // - nome, email, senha: valores dos campos do formulário.
-  // - loading: enquanto a requisição estiver em andamento.
-  // - error: mensagem exibida no toast quando algo dá errado.
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [senha, setSenha] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+    // Estados controlando os inputs e a UI:
+    // - nome, email, senha: valores dos campos do formulário.
+    // - loading: enquanto a requisição estiver em andamento.
+    // - error: mensagem exibida no toast quando algo dá errado.
+    const [nome, setNome] = useState("");
+    const [email, setEmail] = useState("");
+    const [senha, setSenha] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [captchaToken, setCaptchaToken] = useState(null); // token do reCAPTCHA
 
-  // Hook do React Router para navegar após o sucesso.
-  const navigate = useNavigate();
+    // Hook do React Router para navegar após o sucesso.
+    const navigate = useNavigate();
 
-  // Hook de autenticação para atualizar o usuário no contexto.
-  const { setUser } = useAuth();
+    // Hook de autenticação para atualizar o usuário no contexto.
+    const { setUser } = useAuth();
 
-  // Handler do submit do formulário.
-  async function handleSubmit(e) {
-    e.preventDefault();     // impede recarregar a página
-    setError("");           // limpa erro anterior (se houver)
-    setLoading(true);       // ativa spinner/botão desabilitado
+    // Handler do submit do formulário.
+    async function handleSubmit(e) {
+        e.preventDefault();     // impede recarregar a página
+        setError("");           // limpa erro anterior (se houver)
 
-    try {
-      // Chamada à API de registro.
-      // IMPORTANTE: credentials: "include" → habilita cookies (refresh HttpOnly).
-      const res = await fetch("http://localhost:3000/api/usuarios/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" }, // corpo é JSON
-        credentials: "include", // recebe/enviar cookies (refresh HttpOnly)
-        body: JSON.stringify({ nome, email, senha }),    // payload
-      });
+        // Se o usuário não marcou o reCAPTCHA, bloqueia o submit
+        if (!captchaToken) {
+            setError("Por favor, confirme o reCAPTCHA antes de registrar.");
+            return;
+        }
 
-      // Tentamos ler JSON mesmo se der erro, para extrair "erro" da API.
-      // Se o corpo vier vazio ou inválido, caímos no objeto {}.
-      const data = await res.json().catch(() => ({}));
+        setLoading(true);       // ativa spinner/botão desabilitado
 
-      // Qualquer status fora da faixa 200–299 entra aqui como erro.
-      if (!res.ok) {
-        throw new Error(data?.erro || "Falha no registro");
-      }
+        try {
+            // Chamada à API de registro.
+            // IMPORTANTE: credentials: "include" → habilita cookies (refresh HttpOnly).
+            const res = await fetch("http://localhost:3000/api/usuarios/register", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" }, // corpo é JSON
+                credentials: "include", // recebe/enviar cookies (refresh HttpOnly)
+                body: JSON.stringify({
+                    nome,
+                    email,
+                    senha,
+                    recaptchaToken: captchaToken, // envia token para o backend validar
+                }),
+            });
 
-      // Esperamos um access_token no corpo da resposta.
-      const at = data?.access_token;
-      if (!at) throw new Error("Resposta sem access_token");
+            // Tentamos ler JSON mesmo se der erro, para extrair "erro" da API.
+            // Se o corpo vier vazio ou inválido, caímos no objeto {}.
+            const data = await res.json().catch(() => ({}));
 
-      // Guardamos APENAS o access token (curta duração) na sessionStorage.
-      // O refresh token NÃO é salvo aqui; ele está no cookie HttpOnly (invisível ao JS).
-      sessionStorage.setItem("at", at);
+            // Qualquer status fora da faixa 200–299 entra aqui como erro.
+            if (!res.ok) {
+                throw new Error(data?.erro || "Falha no registro");
+            }
 
-      // Atualiza imediatamente o contexto de autenticação.
-      try {
-        const decoded = jwtDecode(at); // { sub, email, nome, exp, ... }
-        setUser(decoded);
-      } catch (e) {
-        console.error("Falha ao decodificar access_token no registro:", e);
-        setUser(null);
-      }
+            // Esperamos um access_token no corpo da resposta.
+            const at = data?.access_token;
+            if (!at) throw new Error("Resposta sem access_token");
 
-      // (Opcional) limpa a senha do estado
-      setSenha("");
+            // Guardamos APENAS o access token (curta duração) na sessionStorage.
+            // O refresh token NÃO é salvo aqui; ele está no cookie HttpOnly (invisível ao JS).
+            sessionStorage.setItem("at", at);
 
-      // Redireciona para a página inicial (ou para "/chamados", se preferir)
-      navigate("/");
-    } catch (error) {
-      // Exibe mensagem de erro no toast (vinda da API ou genérica).
-      setError(error.message || "Erro inesperado");
-    } finally {
-      // Independentemente de sucesso/erro, finaliza o estado de loading.
-      setLoading(false);
+            // Atualiza imediatamente o contexto de autenticação.
+            try {
+                const decoded = jwtDecode(at); // { sub, email, nome, exp, ... }
+                setUser(decoded);
+            } catch (e) {
+                console.error("Falha ao decodificar access_token no registro:", e);
+                setUser(null);
+            }
+
+            // (Opcional) limpa a senha do estado
+            setSenha("");
+            // (Opcional) limpa o reCAPTCHA
+            setCaptchaToken(null);
+
+            // Redireciona para a página inicial (ou para "/chamados", se preferir)
+            navigate("/");
+        } catch (error) {
+            // Exibe mensagem de erro no toast (vinda da API ou genérica).
+            setError(error.message || "Erro inesperado");
+        } finally {
+            // Independentemente de sucesso/erro, finaliza o estado de loading.
+            setLoading(false);
+        }
     }
-  }
 
-  return (
-    <div>
-      {/* Toast simples de erro (usa classes do Bootstrap).
+    return (
+        <div>
+            {/* Toast simples de erro (usa classes do Bootstrap).
          Renderiza somente quando "error" tem conteúdo. */}
-      {error && <Toast error={error} setError={setError} />}
+            {error && <Toast error={error} setError={setError} />}
 
-      {/* Formulário controlado:
+            {/* Formulário controlado:
           - value vem do estado
           - onChange atualiza o estado */}
-      <form onSubmit={handleSubmit} className="m-2">
-        <div className="my-2">
-          <label htmlFor="id-input-nome" className="form-label">
-            Nome
-          </label>
-          <input
-            id="id-input-nome"
-            type="text"
-            className="form-control"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-            required // atributo HTML: impede submit se estiver vazio
-            placeholder="Digite seu nome"
-          />
-        </div>
+            <form onSubmit={handleSubmit} className="m-2">
+                <div className="my-2">
+                    <label htmlFor="id-input-nome" className="form-label">
+                        Nome
+                    </label>
+                    <input
+                        id="id-input-nome"
+                        type="text"
+                        className="form-control"
+                        value={nome}
+                        onChange={(e) => setNome(e.target.value)}
+                        required // atributo HTML: impede submit se estiver vazio
+                        placeholder="Digite seu nome"
+                    />
+                </div>
 
-        <div className="my-2">
-          <label htmlFor="id-input-email" className="form-label">
-            E-mail
-          </label>
-          <input
-            id="id-input-email"
-            type="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            placeholder="Digite seu e-mail"
-          />
-        </div>
+                <div className="my-2">
+                    <label htmlFor="id-input-email" className="form-label">
+                        E-mail
+                    </label>
+                    <input
+                        id="id-input-email"
+                        type="email"
+                        className="form-control"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                        placeholder="Digite seu e-mail"
+                    />
+                </div>
 
-        <div className="my-2">
-          <label htmlFor="id-input-senha" className="form-label">
-            Senha
-          </label>
-          <input
-            id="id-input-senha"
-            type="password"
-            className="form-control"
-            value={senha}
-            onChange={(e) => setSenha(e.target.value)}
-            required
-            placeholder="Digite sua senha"
-          />
-        </div>
+                <div className="my-2">
+                    <label htmlFor="id-input-senha" className="form-label">
+                        Senha
+                    </label>
+                    <input
+                        id="id-input-senha"
+                        type="password"
+                        className="form-control"
+                        value={senha}
+                        onChange={(e) => setSenha(e.target.value)}
+                        required
+                        placeholder="Digite sua senha"
+                    />
+                </div>
 
-        {/* Botão desabilita enquanto loading=true para evitar duplo submit */}
-        <button type="submit" className="btn btn-primary" disabled={loading}>
-          {loading ? "Registrando…" : "Registrar"}
-        </button>
-      </form>
-    </div>
-  );
+                {/* reCAPTCHA do Google */}
+                <div className="my-2">
+                    <ReCaptcha setCaptchaToken={setCaptchaToken} />
+                </div>
+
+                {/* Botão desabilita enquanto loading=true
+                    e também se o reCAPTCHA não estiver marcado */}
+                <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={loading || !captchaToken}
+                >
+                    {loading ? "Registrando…" : "Registrar"}
+                </button>
+            </form>
+        </div>
+    );
 };
 
 export default UsuariosFormRegister;

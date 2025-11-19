@@ -27,6 +27,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuthFetch } from '../../auth/useAuthFetch';
 import Toast from '../shared/Toast';
+import ReCaptcha from '../shared/ReCAPTCHA';
 
 /**
  * Componente de formulário para criar um novo chamado.
@@ -42,6 +43,9 @@ const ChamadoFormCreate = () => {
     // Estado para armazenar mensagens de erro e exibir no toast.
     const [error, setError] = useState(null);
 
+    // Token do reCAPTCHA (preenchido pelo componente ReCaptcha).
+    const [captchaToken, setCaptchaToken] = useState(null);
+
     // Hook para redirecionar a rota após sucesso.
     const navigate = useNavigate();
 
@@ -53,11 +57,19 @@ const ChamadoFormCreate = () => {
     const handleSubmit = async (e) => {
         e.preventDefault(); // evita recarregar a página no submit
 
+        // Se o usuário não marcou o reCAPTCHA, bloqueia o submit
+        if (!captchaToken) {
+            setError('Por favor, confirme o reCAPTCHA antes de enviar o chamado.');
+            return;
+        }
+
         // Monta um corpo multipart/form-data (texto + arquivo).
         const fd = new FormData();
         fd.append('texto', texto);
         fd.append('estado', estado);
         if (imagem) fd.append('imagem', imagem); // só envia se existir
+        // Envia também o token do reCAPTCHA para o backend validar
+        fd.append('recaptchaToken', captchaToken);
 
         try {
             // Envia para a API usando o authFetch (igual ao fetch, mas com Bearer/refresh).
@@ -90,7 +102,7 @@ const ChamadoFormCreate = () => {
     // Dica: os valores “value” dos inputs vêm dos estados; “onChange” atualiza os estados.
     return (
         <form onSubmit={handleSubmit} className='m-2' encType="multipart/form-data">
-            
+
             {/* Toast de erro simples. Fica visível quando "error" tem conteúdo. */}
             {error && <Toast error={error} setError={setError} />}
 
@@ -132,13 +144,24 @@ const ChamadoFormCreate = () => {
                 />
             </div>
 
-            {/* Botão de envio do formulário */}
+            {/* reCAPTCHA do Google */}
             <div className='my-2'>
-                <button type='submit' className='btn btn-primary'>Enviar</button>
+                <ReCaptcha setCaptchaToken={setCaptchaToken} />
+            </div>
+
+            {/* Botão de envio do formulário.
+                Desabilita enquanto o reCAPTCHA não estiver marcado. */}
+            <div className='my-2'>
+                <button
+                    type='submit'
+                    className='btn btn-primary'
+                    disabled={!captchaToken}
+                >
+                    Enviar
+                </button>
             </div>
         </form>
     )
 }
 
 export default ChamadoFormCreate
-

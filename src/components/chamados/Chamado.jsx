@@ -157,7 +157,8 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
 
                     {/* Botões "Editar" e "Remover" estão presentes para futuras ações. */}
                     {(currentUserId == chamado.Usuarios_id || currentUserIsAdmin) && <Link to={`/chamados/${chamado.id}/edit`} className="btn btn-info me-2 text-white">Editar</Link>}
-                    {(currentUserId == chamado.Usuarios_id || currentUserIsAdmin) && <button className="btn btn-danger me-2" onClick={handleChamadoDelete}>Remover</button>}
+                    {/* Remoção somente para ADMIN */}
+                    {(currentUserIsAdmin) && <button className="btn btn-danger me-2" onClick={handleChamadoDelete}>Remover</button>}
                 </div>
             </div>
         </div>
