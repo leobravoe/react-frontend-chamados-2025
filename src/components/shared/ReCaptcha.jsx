@@ -6,141 +6,129 @@ const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY;
 
 // Lê o tema atual do Bootstrap a partir do <html>
 const getBootstrapTheme = () => {
-  if (typeof document === "undefined") return "light";
+    if (typeof document === "undefined") return "light";
 
-  const html = document.documentElement;
-  const attr = html.getAttribute("data-bs-theme");
+    const html = document.documentElement;
+    const attr = html.getAttribute("data-bs-theme");
 
-  // Qualquer coisa diferente de "dark" tratamos como "light"
-  return attr === "dark" ? "dark" : "light";
+    // Qualquer coisa diferente de "dark" tratamos como "light"
+    return attr === "dark" ? "dark" : "light";
 };
 
 const ReCaptcha = ({ setCaptchaToken }) => {
-  const [recaptchaTheme, setRecaptchaTheme] = useState(getBootstrapTheme());
-  const wrapperRef = useRef(null);
+    const [recaptchaTheme, setRecaptchaTheme] = useState(getBootstrapTheme());
+    const wrapperRef = useRef(null);
 
-  // Mantém o tema sincronizado com <html data-bs-theme="...">
-  useEffect(() => {
-    const updateTheme = () => {
-      setRecaptchaTheme(getBootstrapTheme());
+    // Mantém o tema sincronizado com <html data-bs-theme="...">
+    useEffect(() => {
+        const updateTheme = () => {
+            setRecaptchaTheme(getBootstrapTheme());
+        };
+
+        // 1) Sincroniza imediatamente após o mount
+        //    (pega o valor final que o script de tema já tiver aplicado)
+        updateTheme();
+
+        // 2) Observa mudanças futuras no atributo data-bs-theme
+        const obs = new MutationObserver(updateTheme);
+        obs.observe(document.documentElement, {
+            attributes: true,
+            attributeFilter: ["data-bs-theme"],
+        });
+
+        return () => obs.disconnect();
+    }, []);
+
+    // Remove borda padrão do iframe do reCAPTCHA
+    useEffect(() => {
+        if (!wrapperRef.current) return;
+
+        const apply = () => {
+            const iframe = wrapperRef.current.querySelector(
+                "iframe[src*='recaptcha']"
+            );
+            if (!iframe) return;
+            iframe.style.border = "none";
+            iframe.style.borderRadius = "0";
+        };
+
+        apply();
+
+        const mo = new MutationObserver(apply);
+        mo.observe(wrapperRef.current, { childList: true, subtree: true });
+
+        return () => mo.disconnect();
+    }, [recaptchaTheme]);
+
+    const handleCaptchaChange = (token) => {
+        setCaptchaToken(token);
     };
 
-    // 1) Sincroniza imediatamente após o mount
-    //    (pega o valor final que o script de tema já tiver aplicado)
-    updateTheme();
+    // Cores principais
+    const bgColor = recaptchaTheme === "dark" ? "#222" : "#f9f9f9";
 
-    // 2) Observa mudanças futuras no atributo data-bs-theme
-    const obs = new MutationObserver(updateTheme);
-    obs.observe(document.documentElement, {
-      attributes: true,
-      attributeFilter: ["data-bs-theme"],
-    });
+    // Parametrização da “moldura”
+    const FRAME_PADDING = 8;     // quanto o container é maior que o recaptcha
+    const OVERLAY_INSET = 4;     // quão “pra dentro” começa o overlay
+    const FRAME_THICKNESS = 10;  // espessura da borda interna opaca
 
-    return () => obs.disconnect();
-  }, []);
-
-  // Remove borda padrão do iframe do reCAPTCHA
-  useEffect(() => {
-    if (!wrapperRef.current) return;
-
-    const apply = () => {
-      const iframe = wrapperRef.current.querySelector(
-        "iframe[src*='recaptcha']"
-      );
-      if (!iframe) return;
-      iframe.style.border = "none";
-      iframe.style.borderRadius = "0";
+    // Container que envolve o iframe (um pouco maior que o reCAPTCHA)
+    const containerStyle = {
+        display: "inline-block",
+        position: "relative",
+        lineHeight: 0,
+        overflow: "hidden",
+        backgroundColor: bgColor,
+        paddingTop: `${FRAME_PADDING}px`,
+        paddingRight: `${FRAME_PADDING}px`,
+        paddingBottom: `${FRAME_PADDING}px`,
+        paddingLeft: `${FRAME_PADDING + 2}px`,
     };
 
-    apply();
+    // Wrapper externo (apenas para respeitar o layout com padding BootStrap)
+    const outerWrapperStyle = {
+        borderRadius: "0.9rem",
+        overflow: "hidden",
+        backgroundColor: bgColor,
+        display: "inline-block",
+        lineHeight: 0,
+    };
 
-    const mo = new MutationObserver(apply);
-    mo.observe(wrapperRef.current, { childList: true, subtree: true });
+    // Overlay por cima do recaptcha:
+    // - centro transparente (mostra o widget)
+    // - borda interna opaca que "come" as laterais/anti-alias
+    const overlayStyle = {
+        position: "absolute",
+        inset: OVERLAY_INSET,
+        pointerEvents: "none",
+        boxShadow: `0 0 0 ${FRAME_THICKNESS}px ${bgColor} inset`,
+    };
 
-    return () => mo.disconnect();
-  }, [recaptchaTheme]);
+    return (
+        <div className="my-2">
+            <div>
+                <label htmlFor="id-google-captcha" className="form-label">Google Captcha</label>
+            </div>
+            <div className="p-1" style={outerWrapperStyle}>
+                <div ref={wrapperRef} style={containerStyle}>
+                    <ReCAPTCHA
+                        id="id-google-captcha"
+                        key={recaptchaTheme}
+                        sitekey={RECAPTCHA_SITE_KEY}
+                        onChange={handleCaptchaChange}
+                        theme={recaptchaTheme}
+                    />
 
-  const handleCaptchaChange = (token) => {
-    setCaptchaToken(token);
-  };
+                    {/* Overlay oca com bordas internas arredondadas e opacas */}
+                    <div id="overlay" style={overlayStyle} />
+                </div>
+            </div>
 
-  // Cores principais
-  const bgColor = recaptchaTheme === "dark" ? "#222" : "#f9f9f9";
-
-  // Parametrização da “moldura”
-  const FRAME_PADDING = 8;     // quanto o container é maior que o recaptcha
-  const OVERLAY_INSET = 4;     // quão “pra dentro” começa o overlay
-  const FRAME_THICKNESS = 10;  // espessura da borda interna opaca
-
-  // Container que envolve o iframe (um pouco maior que o reCAPTCHA)
-  const containerStyle = {
-    display: "inline-block",
-    position: "relative",
-    lineHeight: 0,
-    overflow: "hidden",
-    backgroundColor: bgColor,
-    paddingTop: `${FRAME_PADDING}px`,
-    paddingRight: `${FRAME_PADDING}px`,
-    paddingBottom: `${FRAME_PADDING}px`,
-    paddingLeft: `${FRAME_PADDING}px`,
-  };
-
-  // Wrapper externo (apenas para respeitar o layout com padding BootStrap)
-  const outerWrapperStyle = {
-    borderRadius: "0.9rem",
-    overflow: "hidden",
-    backgroundColor: bgColor,
-    display: "inline-block",
-    lineHeight: 0,
-  };
-
-  // Overlay por cima do recaptcha:
-  // - centro transparente (mostra o widget)
-  // - borda interna opaca que "come" as laterais/anti-alias
-  const overlayStyle = {
-    position: "absolute",
-    inset: OVERLAY_INSET,
-    pointerEvents: "none",
-    boxShadow: `0 0 0 ${FRAME_THICKNESS}px ${bgColor} inset`,
-  };
-
-  const labelStyle = {
-    fontSize: "0.8rem",
-    textTransform: "uppercase",
-    fontWeight: 600,
-    color: "var(--bs-secondary-color)",
-    marginBottom: "0.25rem",
-  };
-
-  const helpTextStyle = {
-    fontSize: "0.8rem",
-    color: "var(--bs-secondary-color)",
-    marginTop: "0.25rem",
-  };
-
-  return (
-    <div className="my-2">
-      <div style={labelStyle}>Verificação de segurança</div>
-
-      <div className="p-1" style={outerWrapperStyle}>
-        <div ref={wrapperRef} style={containerStyle}>
-          <ReCAPTCHA
-            key={recaptchaTheme}
-            sitekey={RECAPTCHA_SITE_KEY}
-            onChange={handleCaptchaChange}
-            theme={recaptchaTheme}
-          />
-
-          {/* Overlay oca com bordas internas arredondadas e opacas */}
-          <div id="overlay" style={overlayStyle} />
+            <div className="form-text text-body">
+                Isso ajuda a proteger sua conta contra acessos automatizados.
+            </div>
         </div>
-      </div>
-
-      <div style={helpTextStyle}>
-        Isso ajuda a proteger sua conta contra acessos automatizados.
-      </div>
-    </div>
-  );
+    );
 };
 
 export default ReCaptcha;
