@@ -1,7 +1,8 @@
 {
     "name": "react-frontend-chamados-2025",
-    "private": true,
-    "version": "0.0.0",
+    "private": false,
+    "version": "1.0.0",
+    "description": "AtendeAí - Organize a fila de atendimento em aulas práticas",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -9,6 +10,8 @@
         "lint": "eslint .",
         "preview": "vite preview"
     },
+    "author": "Leonardo Bravo Estácio",
+    "license": "MIT",
     "dependencies": {
         "bootstrap": "^5.3.8",
         "jwt-decode": "^4.0.0",
