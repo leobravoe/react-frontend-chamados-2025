@@ -8,6 +8,7 @@ const ChamadosListFilter = ({ value, onChange }) => {
     return (
         <div className="mx-2 my-2">
             <select
+                id="id-select-estado"
                 className="form-select"
                 onChange={handleFilterChange}
                 value={value}

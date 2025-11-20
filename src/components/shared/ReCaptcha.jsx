@@ -107,12 +107,11 @@ const ReCaptcha = ({ setCaptchaToken }) => {
     return (
         <div className="my-2">
             <div>
-                <label htmlFor="id-google-captcha" className="form-label">Google Captcha</label>
+                <div className="form-label">Google Captcha</div>
             </div>
             <div className="p-1" style={outerWrapperStyle}>
-                <div ref={wrapperRef} style={containerStyle}>
+                <div id="id-google-captcha" ref={wrapperRef} style={containerStyle}>
                     <ReCAPTCHA
-                        id="id-google-captcha"
                         key={recaptchaTheme}
                         sitekey={RECAPTCHA_SITE_KEY}
                         onChange={handleCaptchaChange}

@@ -16,13 +16,13 @@ const ChamadoShow = ({ chamado }) => {
             </div>
             <div className='my-2'>
                 <label htmlFor="id-input-estado" className='form-label'>Estado</label>
-                {estado === "a" && <input className="form-control" type="text" id="id-input-texto" value="Aberto" readOnly />}
-                {estado === "f" && <input className="form-control" type="text" id="id-input-texto" value="Fechado" readOnly />}
+                {estado === "a" && <input className="form-control" type="text" id="id-input-estado" value="Aberto" readOnly />}
+                {estado === "f" && <input className="form-control" type="text" id="id-input-estado" value="Fechado" readOnly />}
             </div>
             <div className='my-2'>
                 {hasImagem && (
                     <>
-                        <label htmlFor="id-input-imagem" className='form-label d-block'>Imagem</label>
+                        <div className='form-label d-block'>Imagem</div>
                         <div className='d-inline-flex gap-2'>
                             {chamado.url_imagem && (
                                 <>
