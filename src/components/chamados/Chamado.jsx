@@ -73,17 +73,17 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
             // e lançamos uma exceção com uma mensagem amigável.
             if (!res.ok) {
                 const body = await res.json().catch(() => null); // se não for JSON, ignora
-                throw new Error(body?.erro || `Erro HTTP: ${res.status}`);
+                throw new Error(`Erro HTTP: ${res.status}. ${body?.erro ?? ``}`);
             }
 
             // Quando o backend responde 200/204 (ou similar) com o registro atualizado,
             // lemos o JSON e avisamos o componente pai para atualizar a lista local.
             const data = await res.json();
             onChamadoEstadoChange(data);
-        } catch (err) {
+        } catch (error) {
             // Qualquer erro (rede, backend, parse de JSON, etc.) cai aqui.
             // Encaminhamos a mensagem para o pai mostrar (ex.: toast).
-            setError(err?.message || 'Erro inesperado');
+            setError(error.message);
         }
     };
 
@@ -97,12 +97,12 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
 
             if (!res.ok) {
                 const body = await res.json().catch(() => null); // se não for JSON, ignora
-                throw new Error(body?.erro || `Erro HTTP: ${res.status}`);
+                throw new Error(`Erro HTTP: ${res.status}. ${body?.erro ?? ``}`);
             }
 
             onChamadoDelete(chamado.id);
-        } catch (err) {
-            setError(err?.message || 'Erro inesperado');
+        } catch (error) {
+            setError(error.message);
         }
     };
 

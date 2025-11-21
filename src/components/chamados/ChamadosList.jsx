@@ -49,7 +49,10 @@ const ChamadosList = () => {
                     method: "GET",
                     signal: abortController.signal,
                 });
-                if (!res.ok) throw new Error(`Erro HTTP: ${res.status} ${(await res.json().catch())?.erro ?? ``}`);
+                if (!res.ok) {
+                    const body = await res.json().catch(() => null); // se não for JSON, ignora
+                    throw new Error(`Erro HTTP: ${res.status}. ${body?.erro ?? ``}`);
+                }
                 if (res.status === 304) return;
 
                 const data = await res.json();

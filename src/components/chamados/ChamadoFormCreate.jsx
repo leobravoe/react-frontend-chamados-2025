@@ -84,8 +84,8 @@ const ChamadoFormCreate = () => {
             if (!response.ok) {
                 const errorData = await response.json().catch(() => null);
                 const errorMessage = errorData?.erro
-                    ? `Erro HTTP: STATUS ${response.status} ${errorData?.erro} ${response.statusText}`
-                    : `Erro HTTP: STATUS ${response.status} ${response.statusText}`;
+                    ? `Erro HTTP: STATUS ${response.status}. ${errorData?.erro} ${response.statusText}`
+                    : `Erro HTTP: STATUS ${response.status}. ${response.statusText}`;
                 throw new Error(errorMessage);
             }
 

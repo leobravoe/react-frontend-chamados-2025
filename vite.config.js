@@ -27,22 +27,33 @@ import react from "@vitejs/plugin-react-swc";
 // (domínios / protocolos) o site pode carregar scripts, estilos, imagens, etc.
 // Isso ajuda a reduzir o risco de ataques como XSS (injeção de scripts).
 const csp = [
-    "default-src 'none'",                      // regra padrão: bloquear tudo, a menos que seja liberado abaixo
-    "script-src 'self'",                      // só permite scripts do próprio domínio (sem CDN, sem inline)
-    "style-src 'self'",                       // só CSS do próprio domínio
-    "img-src 'self' data:",                   // imagens locais ou embutidas via data: (ex.: base64)
-    "font-src 'self'",                        // fontes somente do próprio domínio
-    "connect-src 'self' http://localhost:3000",
-    // ↑ Permite requisições (fetch/XHR/WebSocket) apenas:
-    //   - para o próprio front ('self')
-    //   - para a API em http://localhost:3000 (backend local, por exemplo)
-    "base-uri 'none'",                        // impede uso de <base> para mudar a base das URLs
-    "frame-ancestors 'none'",                 // impede que seu site seja colocado em iframes de outros sites
-    "form-action 'self'",                     // formulários só podem enviar dados para o mesmo domínio
-    "object-src 'none'",                      // bloqueia <object>, <embed>, <applet> (recursos antigos e perigosos)
-    "frame-src 'none'",                       // impede carregar outros sites dentro de iframes (a não ser que libere aqui)
-    "upgrade-insecure-requests",              // em HTTPS, força links http:// a virarem https:// automaticamente
-].join("; "); // transforma o array em uma string única, separando cada diretiva por "; "
+  "default-src 'none'",
+
+  // Libera ReCAPTCHA scripts (google + gstatic)
+  "script-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+  // Alguns browsers distinguem script-src-elem
+  "script-src-elem 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+
+  "style-src 'self'",
+  // ReCAPTCHA carrega assets como imagens em gstatic/google
+  "img-src 'self' data: https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ http://localhost:3000",
+  "font-src 'self'",
+
+  // ReCAPTCHA faz requests XHR/fetch pra google/gstatic
+  "connect-src 'self' http://localhost:3000 https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+  
+  "base-uri 'none'",
+  "frame-ancestors 'none'",
+  "form-action 'self'",
+  "object-src 'none'",
+
+  // Iframes do ReCAPTCHA
+  "frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
+  // Se quiser ser extra seguro, pode manter child-src junto:
+  // "child-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
+
+  "upgrade-insecure-requests",
+].join("; ");
 
 // -----------------------------------------------------------------------------
 // EXPORTANDO A CONFIGURAÇÃO PARA O VITE
