@@ -19,17 +19,17 @@ import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap/dist/js/bootstrap.min.js"
 
 const router = createBrowserRouter([
-    { path: "/", element: <App /> },
-    { path: "/sobre", element: <Sobre /> },
-    { path: "/contato", element: <Contato /> },
+    { path: "/chamados-build/", element: <App /> },
+    { path: "/chamados-build/sobre", element: <Sobre /> },
+    { path: "/chamados-build/contato", element: <Contato /> },
     
-    { path: "/chamados", element: <ChamadosIndex /> },
-    { path: "/chamados/create", element: <ChamadosCreate /> },
-    { path: "/chamados/:id", element: <ChamadosShow /> },
-    { path: "/chamados/:id/edit", element: <ChamadosEdit /> },
+    { path: "/chamados-build/chamados", element: <ChamadosIndex /> },
+    { path: "/chamados-build/chamados/create", element: <ChamadosCreate /> },
+    { path: "/chamados-build/chamados/:id", element: <ChamadosShow /> },
+    { path: "/chamados-build/chamados/:id/edit", element: <ChamadosEdit /> },
 
-    { path: "/usuarios/login", element: <UsuariosLogin /> },
-    { path: "/usuarios/register", element: <UsuariosRegister /> },
+    { path: "/chamados-build/usuarios/login", element: <UsuariosLogin /> },
+    { path: "/chamados-build/usuarios/register", element: <UsuariosRegister /> },
 ]);
 
 createRoot(document.getElementById('root')).render(

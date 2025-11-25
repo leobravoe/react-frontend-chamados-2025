@@ -120,18 +120,20 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
                     <strong>#{chamado.Usuarios_id}</strong>
                 </div>
                 <div className="card-body">
-                    {/* Se houver imagem, tenta exibir; se der erro no carregamento, usa um fallback local */}
-                    {chamado.url_imagem && (
-                        <img
-                            className="me-2"
-                            width={40}
-                            src={chamado.url_imagem}
-                            onError={(e) =>
-                                (e.currentTarget.src = '/img/imagemErro404.png')
-                            }
-                        />
-                    )}
-                    <Link to={`/chamados/${chamado.id}`} className='text-body text-decoration-none'>{chamado.texto}</Link>
+                    <Link to={`/chamados/${chamado.id}`} className='text-body text-decoration-none'>
+                        {/* Se houver imagem, tenta exibir; se der erro no carregamento, usa um fallback local */}
+                        {chamado.url_imagem && (
+                            <img
+                                className="me-2 rounded"
+                                width={40}
+                                src={chamado.url_imagem}
+                                onError={(e) =>
+                                    (e.currentTarget.src = '/img/imagemErro404.png')
+                                }
+                            />
+                        )}
+                        <span>{chamado.texto}</span>
+                    </Link>
                 </div>
                 <div className="card-footer text-body-secondary">
                     {/* Botão que alterna o estado do chamado.
