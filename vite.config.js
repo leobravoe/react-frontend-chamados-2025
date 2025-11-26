@@ -36,11 +36,11 @@ const csp = [
 
   "style-src 'self'",
   // ReCAPTCHA carrega assets como imagens em gstatic/google
-  "img-src 'self' data: https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ http://localhost:3000",
+  "img-src 'self' data: https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ http://localhost:3000 https://node-chamados-backend-2025.onrender.com",
   "font-src 'self'",
 
   // ReCAPTCHA faz requests XHR/fetch pra google/gstatic
-  "connect-src 'self' http://localhost:3000 https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/",
+  "connect-src 'self' https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ http://localhost:3000 https://node-chamados-backend-2025.onrender.com",
   
   "base-uri 'none'",
   "frame-ancestors 'none'",
@@ -50,7 +50,7 @@ const csp = [
   // Iframes do ReCAPTCHA
   "frame-src 'self' https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
   // Se quiser ser extra seguro, pode manter child-src junto:
-  // "child-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
+  "child-src https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/",
 
   "upgrade-insecure-requests",
 ].join("; ");
@@ -61,6 +61,8 @@ const csp = [
 // `defineConfig` recebe um objeto com as opções do Vite e exporta como padrão.
 // O Vite lê esse arquivo automaticamente quando você roda `npm run dev` ou `npm run build`.
 export default defineConfig({
+    // Caminho para o deploy do front-end
+    base: "/react-frontend-chamados-2025/",
     // Plugins que o Vite deve usar; aqui só estamos usando o plugin do React.
     plugins: [react()],
 

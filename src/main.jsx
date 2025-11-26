@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { createHashRouter, RouterProvider } from "react-router-dom";
 
 import { AuthProvider } from "./auth/AuthContext";
 
@@ -18,7 +18,7 @@ import UsuariosRegister from './pages/usuarios/UsuariosRegister.jsx';
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap/dist/js/bootstrap.min.js"
 
-const router = createBrowserRouter([
+const router = createHashRouter([
     { path: "/", element: <App /> },
     { path: "/sobre", element: <Sobre /> },
     { path: "/contato", element: <Contato /> },
