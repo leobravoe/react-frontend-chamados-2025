@@ -121,8 +121,10 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
         <div>
             <div className="card m-2">
                 <div className="card-header">
-                    Chamado <strong>#{chamado.id}</strong> Criado por: {' '}
-                    <strong>#{chamado.nome}</strong>
+                    <div className='d-flex justify-content-between'>
+                        <span>Chamado <strong>#{chamado.id}</strong> </span>
+                        <span>Criado por: {' '} <strong>{chamado.nome}</strong></span>
+                    </div>
                 </div>
                 <div className="card-body">
                     <Link to={`/chamados/${chamado.id}`} className='text-body text-decoration-none'>
