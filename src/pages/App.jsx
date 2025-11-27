@@ -15,7 +15,6 @@ const App = () => {
     return (
         <div>
             <Navbar />
-            <h1 className="mx-2">App.jsx</h1>
             <div className="d-flex flex-wrap gap-2 mx-2">
                 {!user && <Link to="/usuarios/login" className="btn btn-primary d-inline">Entrar com Usuários</Link>}
                 {!user && <Link to="/usuarios/register" className="btn btn-primary d-inline">Registrar Usuários</Link>}

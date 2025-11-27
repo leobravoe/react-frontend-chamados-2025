@@ -21,7 +21,6 @@ const UsuariosLogin = () => {
     return (
         <div>
             <Navbar />
-            <h1 className="mx-2">UsuariosLogin.jsx</h1>
             <Link to="/" className="btn btn-primary mx-2">Voltar</Link>
             <UsuariosFormLogin />
         </div>

@@ -60,7 +60,6 @@ const ChamadosShow = () => {
     return (
         <div>
             <Navbar />
-            <h1 className='mx-2'>ChamadosEdit.jsx</h1>
             <Link to="/chamados" className="btn btn-primary mx-2">Voltar</Link>
             <ChamadoShow chamado={chamadoData} />
         </div>
