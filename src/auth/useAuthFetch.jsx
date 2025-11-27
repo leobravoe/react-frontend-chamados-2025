@@ -8,6 +8,9 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const useAuthFetch = () => {
     const navigate = useNavigate();
 
@@ -46,7 +49,7 @@ const useAuthFetch = () => {
             }
 
             // 401 → tenta renovar o access token usando o refresh token (cookie HttpOnly)
-            const refreshRes = await fetch("http://localhost:3000/api/usuarios/refresh", {
+            const refreshRes = await fetch(`${API_BASE_URL}/api/usuarios/refresh`, {
                 method: "POST",
                 credentials: "include", // envia cookie HttpOnly do refresh
                 signal,
