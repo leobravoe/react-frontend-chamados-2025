@@ -16,6 +16,9 @@ import Toast from "../shared/Toast";
 import { useAuth } from "../../auth/useAuth";
 import ReCaptcha from "../shared/ReCAPTCHA";
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const UsuariosFormLogin = () => {
     // Estados controlados dos inputs e da UI:
     const [email, setEmail] = useState("");        // valor do campo "E-mail"
@@ -42,7 +45,7 @@ const UsuariosFormLogin = () => {
         try {
             // Chamada à API de login:
             // Agora enviamos também o token do reCAPTCHA para o backend validar.
-            const res = await fetch("http://localhost:3000/api/usuarios/login", {
+            const res = await fetch(`${API_BASE_URL}/api/usuarios/login`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include", // recebe/enviar cookies (refresh HttpOnly)

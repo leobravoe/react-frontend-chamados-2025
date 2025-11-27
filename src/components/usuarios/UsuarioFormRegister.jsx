@@ -29,6 +29,9 @@ import Toast from "../shared/Toast";
 import { useAuth } from "../../auth/useAuth";
 import ReCaptcha from "../shared/ReCAPTCHA";
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const UsuariosFormRegister = () => {
     // Estados controlando os inputs e a UI:
     // - nome, email, senha: valores dos campos do formulário.
@@ -63,7 +66,7 @@ const UsuariosFormRegister = () => {
         try {
             // Chamada à API de registro.
             // IMPORTANTE: credentials: "include" → habilita cookies (refresh HttpOnly).
-            const res = await fetch("http://localhost:3000/api/usuarios/register", {
+            const res = await fetch(`${API_BASE_URL}/api/usuarios/register`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" }, // corpo é JSON
                 credentials: "include", // recebe/enviar cookies (refresh HttpOnly)

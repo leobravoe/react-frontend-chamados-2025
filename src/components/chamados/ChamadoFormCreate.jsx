@@ -29,6 +29,9 @@ import { useAuthFetch } from '../../auth/useAuthFetch';
 import Toast from '../shared/Toast';
 import ReCaptcha from '../shared/ReCAPTCHA';
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 /**
  * Componente de formulário para criar um novo chamado.
  * Ele gerencia o estado do formulário, a submissão e a navegação.
@@ -74,7 +77,7 @@ const ChamadoFormCreate = () => {
         try {
             // Envia para a API usando o authFetch (igual ao fetch, mas com Bearer/refresh).
             // NÃO defina "Content-Type" manualmente quando usar FormData.
-            const response = await authFetch('http://localhost:3000/api/chamados', {
+            const response = await authFetch(`${API_BASE_URL}/api/chamados`, {
                 method: 'POST',
                 body: fd
             });

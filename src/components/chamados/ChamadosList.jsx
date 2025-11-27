@@ -6,6 +6,9 @@ import { useAuthFetch } from "../../auth/useAuthFetch";
 import Toast from "../shared/Toast";
 import ChamadosListFilter from "./ChamadosListFilter";
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 function filtrarPorEstado(lista, estado) {
     if (!estado) return lista; // "" = todos
     return lista.filter((ch) => ch.estado === estado);
@@ -45,7 +48,7 @@ const ChamadosList = () => {
 
         const fetchChamados = async () => {
             try {
-                const res = await authFetch("http://localhost:3000/api/chamados", {
+                const res = await authFetch(`${API_BASE_URL}/api/chamados`, {
                     method: "GET",
                     signal: abortController.signal,
                 });

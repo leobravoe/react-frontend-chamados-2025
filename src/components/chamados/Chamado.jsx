@@ -30,6 +30,11 @@ import { Link } from 'react-router-dom';
 import { useAuthFetch } from '../../auth/useAuthFetch';
 import { useAuth } from '../../auth/useAuth';
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+import fallbackImg from './assets/imagemErro404.png';
+
 // Componente responsável por renderizar UM chamado da lista.
 // Props:
 // - chamado: objeto com dados do chamado (id, texto, estado, url_imagem, etc.).
@@ -48,7 +53,7 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
     // f  = fechado/inativo
     const handleEstadoChange = async () => {
         // Monta a URL do recurso que será atualizado (PATCH /api/chamados/:id).
-        const url = `http://localhost:3000/api/chamados/${chamado.id}`;
+        const url = `${API_BASE_URL}/api/chamados/${chamado.id}`;
 
         // Prepara o corpo da requisição. Aqui enviamos apenas o campo "estado"
         // trocando 'a' por 'f' e vice-versa. O backend fará a atualização parcial (PATCH).
@@ -88,7 +93,7 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
     };
 
     const handleChamadoDelete = async () => {
-        const url = `http://localhost:3000/api/chamados/${chamado.id}`;
+        const url = `${API_BASE_URL}/api/chamados/${chamado.id}`;
 
         try {
             const res = await authFetch(url, {
@@ -127,9 +132,10 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
                                 className="me-2 rounded"
                                 width={40}
                                 src={chamado.url_imagem}
-                                onError={(e) =>
-                                    (e.currentTarget.src = '/img/imagemErro404.png')
-                                }
+                                onError={(e) => {
+                                    e.currentTarget.onerror = null;      // evita loop infinito
+                                    e.currentTarget.src = fallbackImg;
+                                }}
                             />
                         )}
                         <span>{chamado.texto}</span>

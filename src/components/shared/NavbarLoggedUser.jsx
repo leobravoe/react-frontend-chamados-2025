@@ -3,6 +3,9 @@ import { useAuthFetch } from "../../auth/useAuthFetch";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const NavbarLoggedUser = () => {
     const navigate = useNavigate();
     const authFetch = useAuthFetch();
@@ -11,7 +14,7 @@ const NavbarLoggedUser = () => {
     const handleLogoutClick = async (e) => {
         e.preventDefault();
         try {
-            await authFetch("http://localhost:3000/api/usuarios/logout", {
+            await authFetch(`${API_BASE_URL}/api/usuarios/logout`, {
                 method: 'POST',
                 credentials: "include"
             });

@@ -5,6 +5,9 @@ import { Link, useParams, Navigate } from 'react-router-dom';
 import { useAuthFetch } from '../../auth/useAuthFetch';
 import { useAuth } from '../../auth/useAuth';
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ChamadosEdit = () => {
     // Pega o 'id' da URL, como você já fez.
     const { id } = useParams();
@@ -25,7 +28,7 @@ const ChamadosEdit = () => {
             setError(null);
 
             try {
-                const response = await authFetch(`http://localhost:3000/api/chamados/${id}`);
+                const response = await authFetch(`${API_BASE_URL}/api/chamados/${id}`);
 
                 if (!response.ok) {
                     throw new Error('Não foi possível carregar os dados do chamado.');

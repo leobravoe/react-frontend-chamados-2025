@@ -4,6 +4,9 @@ import { useAuthFetch } from '../../auth/useAuthFetch';
 import Toast from '../shared/Toast';
 import ReCaptcha from '../shared/ReCAPTCHA';
 
+// Pega a API_BASE_URL da variável de ambiente
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const ChamadoEditForm = ({ chamado }) => {
     const [texto, setTexto] = useState(chamado.texto);
     const [estado, setEstado] = useState(chamado.estado);
@@ -39,7 +42,7 @@ const ChamadoEditForm = ({ chamado }) => {
 
         try {
             // 2. Envia a requisição para a API
-            const response = await authFetch(`http://localhost:3000/api/chamados/${chamado.id}`, {
+            const response = await authFetch(`${API_BASE_URL}/api/chamados/${chamado.id}`, {
                 method: 'PUT',
                 body: formData,
             });
@@ -72,7 +75,7 @@ const ChamadoEditForm = ({ chamado }) => {
 
         try {
             // 2. Envia a requisição para a API
-            const response = await authFetch(`http://localhost:3000/api/chamados/${chamado.id}`, {
+            const response = await authFetch(`${API_BASE_URL}/api/chamados/${chamado.id}`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
