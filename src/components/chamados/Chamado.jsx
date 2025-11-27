@@ -121,7 +121,7 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
         <div>
             <div className="card m-2">
                 <div className="card-header">
-                    Chamado <strong>#{chamado.id}</strong> - 
+                    Chamado <strong>#{chamado.id}</strong> Criado por: {' '}
                     <strong>#{chamado.nome}</strong>
                 </div>
                 <div className="card-body">
