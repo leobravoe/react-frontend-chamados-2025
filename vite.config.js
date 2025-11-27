@@ -61,7 +61,7 @@ const csp = [
 // `defineConfig` recebe um objeto com as opções do Vite e exporta como padrão.
 // O Vite lê esse arquivo automaticamente quando você roda `npm run dev` ou `npm run build`.
 export default defineConfig({
-    // Caminho para o deploy do front-end
+    // Nome do repositório no github
     base: "/react-frontend-chamados-2025/",
     // Plugins que o Vite deve usar; aqui só estamos usando o plugin do React.
     plugins: [react()],
