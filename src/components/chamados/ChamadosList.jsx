@@ -93,8 +93,15 @@ const ChamadosList = () => {
     // Chamado alterado (ex.: mudou estado de "a" para "f")
     const onChamadoEstadoChange = (chamadoAlterado) => {
         setAllChamados((prev) => {
-            const novaLista = prev.map((ch) =>
-                ch.id === chamadoAlterado.id ? chamadoAlterado : ch
+            const novaLista = prev.map((ch) => {
+                // Insere o nome que o patch não devolve
+                if( ch.id === chamadoAlterado.id )
+                {
+                    chamadoAlterado.nome = ch.nome
+                    return chamadoAlterado 
+                }
+                return ch
+            }
             );
             localStorage.setItem("chamadosCache", JSON.stringify(novaLista));
             return novaLista;

@@ -1,13 +1,13 @@
 const ChamadoShow = ({ chamado }) => {
-    const Usuarios_id = chamado.Usuarios_id;
+    const nome = chamado.nome;
     const texto = chamado.texto;
     const estado = chamado.estado;
 
     return (
         <div className='m-2'>
             <div className='my-2'>
-                <label htmlFor="id-input-id" className='form-label'>Usuarios_id</label>
-                <input className="form-control" type="text" id="id-input-id" value={Usuarios_id} readOnly />
+                <label htmlFor="id-input-nome" className='form-label'>Nome</label>
+                <input className="form-control" type="text" id="id-input-nome" value={nome} readOnly />
             </div>
             <div className='my-2'>
                 <label htmlFor="id-input-texto" className='form-label'>Texto</label>

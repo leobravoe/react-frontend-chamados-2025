@@ -122,7 +122,7 @@ const Chamado = ({ chamado, setError, onChamadoEstadoChange, onChamadoDelete }) 
             <div className="card m-2">
                 <div className="card-header">
                     Chamado <strong>#{chamado.id}</strong> Usuário{' '}
-                    <strong>#{chamado.Usuarios_id}</strong>
+                    <strong>#{chamado.nome}</strong>
                 </div>
                 <div className="card-body">
                     <Link to={`/chamados/${chamado.id}`} className='text-body text-decoration-none'>
