@@ -21,7 +21,7 @@ const UsuariosLogin = () => {
     return (
         <div>
             <Navbar />
-            <Link to="/" className="btn btn-primary mx-2">Voltar</Link>
+            <Link to="/" className="btn btn-primary mx-2 mt-2">Voltar</Link>
             <UsuariosFormLogin />
         </div>
     );

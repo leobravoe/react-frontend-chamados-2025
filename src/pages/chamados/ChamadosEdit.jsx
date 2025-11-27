@@ -69,7 +69,7 @@ const ChamadosEdit = () => {
     return (
         <div>
             <Navbar />
-            <Link to="/chamados" className="btn btn-primary mx-2">Voltar</Link>
+            <Link to="/chamados" className="btn btn-primary mx-2 mt-2">Voltar</Link>
             <ChamadoEditForm chamado={chamadoData} />
         </div>
     );

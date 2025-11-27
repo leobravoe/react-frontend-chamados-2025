@@ -19,7 +19,7 @@ const ChamadosIndex = () => {
     return (
         <div>
             <Navbar />
-            <div className='d-flex flex-wrap gap-2 mx-2'>
+            <div className='d-flex flex-wrap gap-2 mx-2 mt-2'>
                 <Link to="/" className="btn btn-primary">Voltar</Link>
                 <Link to="/chamados/create" className='btn btn-primary'>Criar Chamado</Link>
             </div>
