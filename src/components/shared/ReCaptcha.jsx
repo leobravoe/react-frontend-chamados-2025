@@ -15,9 +15,11 @@ const getBootstrapTheme = () => {
     return attr === "dark" ? "dark" : "light";
 };
 
-const ReCaptcha = ({ setCaptchaToken }) => {
+const ReCaptcha = ({ setCaptchaToken, loading }) => {
     const [recaptchaTheme, setRecaptchaTheme] = useState(getBootstrapTheme());
     const wrapperRef = useRef(null);
+    const recaptchaRef = useRef(null); // acesso ao widget p/ reset()
+    const prevLoadingRef = useRef(false);
 
     // Mantém o tema sincronizado com <html data-bs-theme="...">
     useEffect(() => {
@@ -26,7 +28,6 @@ const ReCaptcha = ({ setCaptchaToken }) => {
         };
 
         // 1) Sincroniza imediatamente após o mount
-        //    (pega o valor final que o script de tema já tiver aplicado)
         updateTheme();
 
         // 2) Observa mudanças futuras no atributo data-bs-theme
@@ -60,8 +61,38 @@ const ReCaptcha = ({ setCaptchaToken }) => {
         return () => mo.disconnect();
     }, [recaptchaTheme]);
 
+    // OBSERVA o ciclo de loading do formulário:
+    // quando loading muda de true → false, significa que a tentativa de login terminou
+    // (com sucesso OU erro). Nesse momento, descartamos o token e resetamos o widget.
+    useEffect(() => {
+        const prev = prevLoadingRef.current;
+        if (prev && !loading) {
+            // terminou uma tentativa
+            if (recaptchaRef.current) {
+                try {
+                    recaptchaRef.current.reset(); // visualmente "desmarca"
+                } catch (e) {
+                    console.warn("Falha ao resetar reCAPTCHA:", e);
+                }
+            }
+            setCaptchaToken(null); // impede reutilizar o token
+        }
+        prevLoadingRef.current = loading;
+    }, [loading, setCaptchaToken]);
+
     const handleCaptchaChange = (token) => {
+        // Token novo emitido pelo Google → envia pro pai
         setCaptchaToken(token);
+    };
+
+    const handleCaptchaExpired = () => {
+        // Token expirou → invalida no estado do pai
+        setCaptchaToken(null);
+    };
+
+    const handleCaptchaErrored = () => {
+        // Erro no widget → força o usuário a refazer o desafio
+        setCaptchaToken(null);
     };
 
     // Cores principais
@@ -112,9 +143,12 @@ const ReCaptcha = ({ setCaptchaToken }) => {
             <div className="p-1" style={outerWrapperStyle}>
                 <div id="id-google-captcha" ref={wrapperRef} style={containerStyle}>
                     <ReCAPTCHA
+                        ref={recaptchaRef}
                         key={recaptchaTheme}
                         sitekey={RECAPTCHA_SITE_KEY}
                         onChange={handleCaptchaChange}
+                        onExpired={handleCaptchaExpired}
+                        onErrored={handleCaptchaErrored}
                         theme={recaptchaTheme}
                     />
 

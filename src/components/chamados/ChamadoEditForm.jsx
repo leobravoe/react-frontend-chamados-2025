@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuthFetch } from '../../auth/useAuthFetch';
 import Toast from '../shared/Toast';
-import ReCaptcha from '../shared/ReCAPTCHA';
+import ReCaptcha from '../shared/ReCaptcha';
 
 // Pega a API_BASE_URL da variável de ambiente
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -14,6 +14,7 @@ const ChamadoEditForm = ({ chamado }) => {
     const [hasImagem, setHasImagem] = useState(chamado.url_imagem ? true : false);
     const [error, setError] = useState(null);
     const [captchaToken, setCaptchaToken] = useState(null);
+    const [loading, setLoading] = useState(false); // controla ciclo de envio/patch
 
     const navigate = useNavigate();
     const authFetch = useAuthFetch();
@@ -31,7 +32,6 @@ const ChamadoEditForm = ({ chamado }) => {
         const formData = new FormData();
 
         // 2. Adicione todos os campos do formulário
-        // A chave ('estado', 'texto', etc.) deve ser o nome que sua API espera
         formData.append('texto', texto);
         formData.append('estado', estado);
         if (imagem) {
@@ -40,8 +40,9 @@ const ChamadoEditForm = ({ chamado }) => {
         // Token do reCAPTCHA para o backend validar
         formData.append('recaptchaToken', captchaToken);
 
+        setLoading(true);
         try {
-            // 2. Envia a requisição para a API
+            // 3. Envia a requisição para a API
             const response = await authFetch(`${API_BASE_URL}/api/chamados/${chamado.id}`, {
                 method: 'PUT',
                 body: formData,
@@ -57,11 +58,14 @@ const ChamadoEditForm = ({ chamado }) => {
             await response.json().catch(() => ({}));
 
             navigate(`/chamados`);
-
         } catch (error) {
             // Se a requisição foi cancelada com AbortController, ignore.
             // Caso contrário, exiba a mensagem no toast.
             if (error?.name !== 'AbortError') setError(error.message);
+        } finally {
+            // encerrou a tentativa (sucesso ou erro)
+            setLoading(false);
+            // o ReCaptcha.jsx vai ver loading true→false, resetar o widget e limpar o token
         }
     }
 
@@ -73,6 +77,7 @@ const ChamadoEditForm = ({ chamado }) => {
             return;
         }
 
+        setLoading(true);
         try {
             // 2. Envia a requisição para a API
             const response = await authFetch(`${API_BASE_URL}/api/chamados/${chamado.id}`, {
@@ -94,11 +99,14 @@ const ChamadoEditForm = ({ chamado }) => {
 
             // Requisição foi um sucesso, agora atualiza o estado local
             setHasImagem(false);
-
         } catch (error) {
             // Se a requisição foi cancelada com AbortController, ignore.
             // Caso contrário, exiba a mensagem no toast.
             if (error?.name !== 'AbortError') setError(error.message);
+        } finally {
+            // terminou a tentativa de PATCH (sucesso ou erro)
+            setLoading(false);
+            // o ReCaptcha.jsx detecta o fim do loading e reseta o captcha/token
         }
     };
 
@@ -155,7 +163,7 @@ const ChamadoEditForm = ({ chamado }) => {
                                     type='button'
                                     className='btn btn-danger'
                                     onClick={deleteImageChamado}
-                                    disabled={!captchaToken}
+                                    disabled={!captchaToken || loading}
                                 >
                                     Excluir
                                 </button>
@@ -175,16 +183,19 @@ const ChamadoEditForm = ({ chamado }) => {
 
             {/* reCAPTCHA do Google */}
             <div className='my-2'>
-                <ReCaptcha setCaptchaToken={setCaptchaToken} />
+                <ReCaptcha
+                    setCaptchaToken={setCaptchaToken}
+                    loading={loading} // informa ao ReCaptcha quando a tentativa está em andamento
+                />
             </div>
 
             <div className='my-2'>
                 <button
                     type='submit'
                     className='btn btn-primary'
-                    disabled={!captchaToken}
+                    disabled={!captchaToken || loading}
                 >
-                    Enviar
+                    {loading ? 'Enviando…' : 'Enviar'}
                 </button>
             </div>
         </form>

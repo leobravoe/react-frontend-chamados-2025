@@ -27,7 +27,7 @@ import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 import Toast from "../shared/Toast";
 import { useAuth } from "../../auth/useAuth";
-import ReCaptcha from "../shared/ReCAPTCHA";
+import ReCaptcha from "../shared/ReCaptcha";
 
 // Pega a API_BASE_URL da variável de ambiente
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -177,7 +177,7 @@ const UsuariosFormRegister = () => {
 
                 {/* reCAPTCHA do Google */}
                 <div className="my-2">
-                    <ReCaptcha setCaptchaToken={setCaptchaToken} />
+                    <ReCaptcha setCaptchaToken={setCaptchaToken} loading={loading} />
                 </div>
 
                 {/* Botão desabilita enquanto loading=true

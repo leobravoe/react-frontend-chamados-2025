@@ -27,7 +27,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import { useAuthFetch } from '../../auth/useAuthFetch';
 import Toast from '../shared/Toast';
-import ReCaptcha from '../shared/ReCAPTCHA';
+import ReCaptcha from '../shared/ReCaptcha';
 
 // Pega a API_BASE_URL da variável de ambiente
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -38,7 +38,6 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
  */
 const ChamadoFormCreate = () => {
     // Estados controlando os inputs do formulário.
-    // Cada setXxx atualiza o valor conforme o usuário digita/seleciona.
     const [texto, setTexto] = useState("");
     const [estado, setEstado] = useState("a");
     const [imagem, setImagem] = useState(null);
@@ -48,6 +47,9 @@ const ChamadoFormCreate = () => {
 
     // Token do reCAPTCHA (preenchido pelo componente ReCaptcha).
     const [captchaToken, setCaptchaToken] = useState(null);
+
+    // Indica se há uma requisição em andamento (para UX e pro ReCaptcha resetar no fim)
+    const [loading, setLoading] = useState(false);
 
     // Hook para redirecionar a rota após sucesso.
     const navigate = useNavigate();
@@ -59,6 +61,7 @@ const ChamadoFormCreate = () => {
     // Aqui montamos o FormData e enviamos para a API.
     const handleSubmit = async (e) => {
         e.preventDefault(); // evita recarregar a página no submit
+        setError(null);     // limpa erro anterior, se houver
 
         // Se o usuário não marcou o reCAPTCHA, bloqueia o submit
         if (!captchaToken) {
@@ -74,6 +77,7 @@ const ChamadoFormCreate = () => {
         // Envia também o token do reCAPTCHA para o backend validar
         fd.append('recaptchaToken', captchaToken);
 
+        setLoading(true);
         try {
             // Envia para a API usando o authFetch (igual ao fetch, mas com Bearer/refresh).
             // NÃO defina "Content-Type" manualmente quando usar FormData.
@@ -98,11 +102,14 @@ const ChamadoFormCreate = () => {
             // Se a requisição foi cancelada com AbortController, ignore.
             // Caso contrário, exiba a mensagem no toast.
             if (error?.name !== 'AbortError') setError(error.message);
+        } finally {
+            // encerrou a tentativa (com sucesso ou erro)
+            setLoading(false);
+            // o ReCaptcha.jsx vai detectar loading true→false e resetar o widget + token
         }
     }
 
     // Renderização do formulário.
-    // Dica: os valores “value” dos inputs vêm dos estados; “onChange” atualiza os estados.
     return (
         <form onSubmit={handleSubmit} className='m-2' encType="multipart/form-data">
 
@@ -128,6 +135,7 @@ const ChamadoFormCreate = () => {
                 <select
                     id='id-select-estado'
                     className='form-select'
+                    value={estado}
                     onChange={(e) => setEstado(e.target.value)}
                 >
                     <option value="a">Aberto</option>
@@ -149,18 +157,21 @@ const ChamadoFormCreate = () => {
 
             {/* reCAPTCHA do Google */}
             <div className='my-2'>
-                <ReCaptcha setCaptchaToken={setCaptchaToken} />
+                <ReCaptcha
+                    setCaptchaToken={setCaptchaToken}
+                    loading={loading}  // informa ao ReCaptcha quando a submissão está em andamento
+                />
             </div>
 
             {/* Botão de envio do formulário.
-                Desabilita enquanto o reCAPTCHA não estiver marcado. */}
+                Desabilita enquanto o reCAPTCHA não estiver marcado ou enquanto estiver carregando. */}
             <div className='my-2'>
                 <button
                     type='submit'
                     className='btn btn-primary'
-                    disabled={!captchaToken}
+                    disabled={!captchaToken || loading}
                 >
-                    Enviar
+                    {loading ? 'Enviando…' : 'Enviar'}
                 </button>
             </div>
         </form>
